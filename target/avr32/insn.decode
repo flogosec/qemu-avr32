@@ -1,0 +1,412 @@
+#
+# QEMU AVR CPU
+#
+# Copyright (c) 2022-2023 Florian Göhler, Johannes Willbold
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, see
+# <http://www.gnu.org/licenses/lgpl-2.1.html>
+#
+&sr                 sr
+&disp               disp
+&rx_ry_rd           rx ry rd
+&rd_disp            rd disp
+&rd_disp8           rd disp
+&rd_rp              rp rd
+&rs_sr              rs sr
+&rs_rd              rs rd
+&rx_ry_imm_rd       rx ry imm rd
+&rx_ry_cond_rd      rx ry cond rd
+&rx_ry_x_y_rd       rx ry x y rd
+#&rx_ry_imm5_rd     rx ry imm5 rd
+&rd_imm8            rd imm8
+&coh_rd_imm         coh rd imm
+&rd_rs_bp5_w5       rd rs bp5 w5
+&rd_bp5             rd bp5
+&bp4_bp1_rd         bp4 bp1 rd
+&rs_rd_32           rs rd
+&rd_rp_disp16       rd rp disp16
+&rp_disp            rp disp
+&bp5_imm15          bp5 imm15
+&rd_sr              rd sr
+&rd_imm16           rd imm16
+&rs                 rs
+&disp8_disp2        disp8 disp2
+&bp_4_bp1_rd        bp4 bp1 rd
+&cond4_rd           cond4 rd
+&bp5                bp5
+&rp_rs              rp rs
+&stm                op rp list
+&pushm              list
+&rd_imm21           immu immm rd imml
+&rd_disp5_rp        rd disp5 rp
+&rs_rp_disp4        rs rp disp4
+&popm               list
+&rd_imm6            rd imm6
+&rp_rs_disp16       rp rs disp16
+&cond_disp21        disp2 disp1 cond disp0
+&rd_bp4_bp1         rd bp4 bp1
+&rd_rx_ry_sa5       rd rx ry sa5
+&rd3_rp_disp        rd3 rp disp
+&rd_cond4_imm8      rd cond4 imm8
+&rd_rs_sa5          rd rs sa5
+&rd_rs_imm8         rd rs imm8
+&rd_rx_ry_sa        rd rx ry sa
+&rs_rd_disp16       rs rd imm16
+&rp_rs_imm16        rp rs imm16
+&rd_rp_disp3        rd rp disp3
+&rd_rp_cond4_disp9  rd rp cond4 disp9
+&mtdr               rs addr
+&rd_rs_cond4        rd rs cond4
+&rd_bp5_sa5         rd bp5 sa5
+&rd_f_cond4_imm8    rd f cond4 imm8
+&rd_rx_ry_cond4     rd rx ry cond4
+&cop                cp opl opm oph crd crx cry
+&op8                op8
+&cache              rp op5 disp11
+&ldinsb             rp rd part disp12
+&ldinsh             rp rd part disp12
+&rp_rd_disp12       rp rd disp12
+
+@op_rd              ... .... ..... rd:4
+@op_rd_imm8         ... . imm8:8 rd:4                           &rd_imm8
+@op_rs_rd           ... rs:4 ..... rd:4                         &rs_rd
+@op_disp8           ... . disp:8 ....                           &disp
+@op_rd_rx_ry        ... rx:4 ..... ry:4 .... ........ rd:4      &rx_ry_rd
+@op_rd_rp           ... rp:4 ..... rd:3 .                       &rd_rp
+@op_rd4_rp           ... rp:4 ..... rd:4                        &rd_rp ###?
+@op_rd_disp         ... .. disp:7 rd:4                          &rd_disp
+@op_rd_disp8        ... . disp:8 . rd:3                         &rd_disp8
+@op_rs_sr           ... ......... rs:4 ........ sr:8            &rs_sr
+#@op_rx_ry_imm_rd    ... rx:4 ..... ry:4 .......... imm:2 rd:4  &rx_ry_imm_rd
+@op_rx_ry_cond_rd   ... rx:4 ..... ry:4 .... cond:4 .... rd:4   &rx_ry_cond_rd
+@op_rx_ry_x_y_rd    ... rx:4 ..... ry:4 .... .... .. x:1 y:1 rd:4 &rx_ry_x_y_rd
+#@op_rx_ry_imm5_rd  ... rx:4 ..... ry:4 ....... imm5:5 rd:4     &rx_ry_imm5_rd
+@op_coh_rd_imm      ... .. . coh:1 ..... rd:4 imm:16            &coh_rd_imm
+@op_rd_rs_bp5_w5    ... rd:4 ..... rs:4 .... .. bp5:5 w5:5      &rd_rs_bp5_w5
+@op_rd_bp5          ... .... ..... rd:4 ........... bp5:5       &rd_bp5
+#@op_bp4_bp1_rd      ... bp4:4 .... bp1:1 rd:4                  &bp4_bp1_rd
+@op_rs_rd_32         ... rs:4 ..... rd:4 .... .... ........     &rs_rd_32
+@op_rd_rp_disp16    ... rp:4 ..... rd:4 disp16:16               &rd_rp_disp16
+@op_rp_disp         ... ......... rp:4 disp:16                  &rp_disp
+@op_bp5_imm15       ... ......... bp5:5 imm15:15                &bp5_imm15
+@op_rd_sr           ... ......... rd:4 ........ sr:8            &rd_sr
+@op_rd_imm16        ... ......... rd:4 imm16:16                 &rd_imm16
+@op_rs              ... ......... rs:4                          &rs
+@op_disp8_disp2     ... . disp8:8 .. disp2:2                    &disp8_disp2
+@op_rd_bp4_bp1      ... bp4:4 .... bp1:1 rd:4                   &bp_4_bp1_rd
+@op_rd_cond4        ... ..... cond4:4 rd:4                      &cond4_rd
+@op_bp5             ....... bp5:5 ....                          &bp5
+@op_rp_rs           ... rp:4 ..... rs:4                         &rp_rs
+@op_rp_rs3          ... rp:4 ... .. rs:3 .                      &rp_rs
+@op_stm             ... ... op:1 ..... rp:4 list:16             &stm
+@op_pushm           ... . list:8 ....                           &pushm
+@op_rd_imm21        ... immu:4 .... immm:1 rd:4 imml:16         &rd_imm21
+@op_rd_disp5_rp     ... rp:4 disp5:5 rd:4                       &rd_disp5_rp
+@op_rs_rp_disp4     ... rp:4 . disp4:4 rs:4                     &rs_rp_disp4
+@op_popm            ... . list:9 ...                            &popm
+@op_rd_imm6         ... ... imm6:6 rd:4                         &rd_imm6
+@op_rp_rs_disp16    ... rp:4 ..... rs:3 . disp16:16             &rp_rs_disp16
+@op_rs_rd_imm16     ... rs:4 ..... rd:4   imm16:16              &rs_rd_disp16
+@op_rp_rs_imm16     ... rp:4 ..... rs:4   imm16:16              &rp_rs_imm16
+@op_cond_disp21     ... disp2:4 .... disp1:1 cond:4 disp0:16    &cond_disp21
+@op_rd_rx_ry_sa5    ... rx:4 ..... ry:4 ....... sa5:5 rd:4      &rd_rx_ry_sa5
+@op_rd_cond4_imm8   ... .... ..... rd:4 .... cond4:4 imm8:8     &rd_cond4_imm8
+@op_rd_rs_sa5       ... rs:4 ..... rd:4 .... .... ... sa5:5     &rd_rs_sa5
+@op_rd_rs_imm8      ... rs:4 ..... rd:4 .... .... imm8:8        &rd_rs_imm8
+@op_rd_rx_ry_sa     ... rx:4 ..... ry:4 .... .... .. sa:2 rd:4  &rd_rx_ry_sa
+@op_rd_rp_disp3     ... rp:4 .. disp3:3 rd:4                    &rd_rp_disp3
+@op_rd_rp_cond4_disp9 ...  rp:4 ..... rd:4 cond4:4 ... disp9:9  &rd_rp_cond4_disp9
+@op_mtdr            ... ......... rs:4 ........ addr:8          &mtdr
+@op_rd_rs_cond4     ... rs:4 ..... rd:4 .... .... cond4:4 ....  &rd_rs_cond4
+@op_rd_bp5_sa5      ... .... ..... rd:4 .... .. bp5:5 sa5:5     &rd_bp5_sa5
+@op_rd_f_cond4_imm8 ... ... f:1 ..... rd:4 .... cond4:4 imm8:8  &rd_f_cond4_imm8
+@op_rd_rx_ry_cond4  ... rx:4 ..... ry:4 .... cond4:4 .... rd:4  &rd_rx_ry_cond4
+@op_nop             . . ...... ...... ..
+@op_cop             ... .. oph:2 ..... opm:4 cp:3 opl:1 crd:4 crx:4 cry:4 &cop
+@op_op8             ........................ op8:8              &op8
+@op_cache           ............ rp:4 op5:5 disp11:11           &cache
+@op_ldinsb          ... rp:4 ..... rd:4 .. part:2 disp12:12     &ldinsb
+@op_ldinsh          ... rp:4 ..... rd:4 ... part:1 disp12:12    &ldinsh
+@op_rp_rd_disp12    ... rp:4 ..... rd:4 .... disp12:12          &rp_rd_disp12
+
+ABS_r           010 1110 00100 ....                          @op_rd
+ACALL_d         110 1 ........ 0000                          @op_disp8
+
+ACR_r           010 1110 00000 ....                          @op_rd
+ADC_rrr         111 .... 00000 .... 0000 00000100 ....       @op_rd_rx_ry
+ADD_rd_rs       000 .... 00000 ....                          @op_rs_rd
+ADD_rd_rx_ry_sa 111 .... 00000 .... 0000 0000 00 .. ....     @op_rd_rx_ry_sa
+ADDCOND4_rrcr       111 .... 11101 .... 1110 .... 0000 ....       @op_rx_ry_cond_rd
+#ADD_rrir        111 .... 00000 .... 0000 0000 00 .. ....     @op_rx_ry_imm_rd
+ADDABS_rrr      111 .... 00000 .... 0000 11100100 ....       @op_rd_rx_ry
+ADDHHW_rrxyr    111 .... 00000 .... 0000 1110 00 . . ....      @op_rx_ry_x_y_rd
+
+AND_rr          000 .... 00110 ....                          @op_rs_rd
+AND_f2          111 .... 11110 .... 0000000 ..... ....      @op_rd_rx_ry_sa5
+AND_f3          111 .... 11110 .... 0000001 ..... ....       @op_rd_rx_ry_sa5
+#ANDLS_rrir     111 .... 11110 .... 0000000 ..... ....       @op_rx_ry_imm5_rd
+#ANDRS_rrir     111 .... 11110 .... 0000001 ..... ....       @op_rx_ry_imm5_rd
+AND_rrcr        111 .... 11101 .... 1110 .... 0010 ....       @op_rx_ry_cond_rd
+ANDH_coh_rd     111 00 1 . 00001 .... ................        @op_coh_rd_imm
+ANDL_coh_rd     111 00 0 . 00001 .... ................        @op_coh_rd_imm
+ANDN_rr         000 .... 01000 ....                           @op_rs_rd
+
+ASR_rrr         111 .... 00000 .... 0000 10000100 ....        @op_rd_rx_ry
+ASR_f2          101 .... 1010 . ....                          @op_rd_bp4_bp1
+ASR_f3          111 .... 00000 .... 0001 0100 000 .....          @op_rd_rs_sa5
+
+BFEXTS          111 .... 11101 .... 1011 00 ..... .....         @op_rd_rs_bp5_w5
+BFEXTU          111 .... 11101 .... 1100 00 ..... .....         @op_rd_rs_bp5_w5
+BFINS           111 .... 11101 .... 1101 00 ..... .....         @op_rd_rs_bp5_w5
+
+BLD             111 0110 11011 .... 00000000000 .....           @op_rd_bp5
+
+# BR{cond} - Branch if Condition Satisfied: Rd, PC[disp]
+BR_rd            1100 ........ 0 ...                            @op_rd_disp8
+BR_disp          111 .... 0100 . .... ................          @op_cond_disp21
+
+BREAKPOINT       1101011 00111 0011
+
+BREV_r          010 1110 01001 ....                             @op_rd
+
+BST             111 0111 11011 .... 00000000000 .....           @op_rd_bp5
+
+CACHE           111101000001 .... ..... ...........             @op_cache
+
+CASTSH           010 1110 01000 ....                             @op_rd
+CASTSB           010 1110 00110 ....                             @op_rd
+CASTUH           010 1110 00111 ....                             @op_rd
+CASTUB           010 1110 00101 ....                             @op_rd
+
+CBR              101 .... 1110 . ....                            @op_rd_bp4_bp1
+
+# CLZ
+CLZ             111 .... 00000 .... 0001 0010 00000000          @op_rs_rd_32
+
+COM             010 1110 01101 ....                             @op_rd
+
+COP             111 00 .. 11010 .... ... . .... .... ....       @op_cop
+
+# COP
+
+CPB_rs_rd       111 .... 00000 .... 0001 1000 00000000         @op_rs_rd_32
+CPH_rs_rd       111 .... 00000 .... 0001 1001 00000000         @op_rs_rd_32
+CPW_rs_rd       000 .... 00011 ....                            @op_rs_rd
+CPW_rd_imm6     010 110 ...... ....                            @op_rd_imm6
+CPW_rd_imm21    111 .... 0010 . .... ................          @op_rd_imm21
+
+CPC_rd          010 1110 00010 ....                            @op_rd
+CPC_rs_rd       111 .... 00000 .... 0001 0011 00000000         @op_rs_rd_32
+
+# CSRF - Clear Status Register Flag: RS
+CSRF_sr         11010 10 ..... 0011                           @op_bp5
+CSRFCZ_sr       11010 00 ..... 0011                           @op_bp5
+
+DIVS_rd_rx_ry   111 .... 00000 .... 0000 1100 0000 ....       @op_rd_rx_ry
+DIVU_rd_rx_ry   111 .... 00000 .... 0000 1101 0000 ....       @op_rd_rx_ry
+
+EOR_rd_rs       000 .... 00101 ....                           @op_rs_rd
+EOR_f2          111 .... 11110 .... 0010000 ..... ....        @op_rd_rx_ry_sa5
+EOR_f3          111 .... 11110 .... 0010001 ..... ....        @op_rd_rx_ry_sa5
+EOR_rd_rx_ry_c  111 .... 11101 .... 1110 .... 0100 ....       @op_rx_ry_cond_rd
+EORH            111 011100001 .... ................           @op_rd_imm16
+EORL            111 011000001 .... ................           @op_rd_imm16
+
+FRS             1101011 10100 0011
+
+ICALL_rd        010 1110 1000 1 ....                          @op_rd
+
+# LD.D - Load Doubleword: rd, rp
+LDD_f1           101 .... 100 00 ... 1                        @op_rd_rp
+LDD_f2           101 .... 100 01 ... 0                        @op_rd_rp
+LDD_f3           101 .... 100 00     ... 0                        @op_rd_rp
+LDD_f4           111 .... 01110 ... 0 ................        @op_rp_rs_disp16
+LDD_f5           111 .... 00000 .... 0000 0010 00 .. ....     @op_rd_rx_ry_sa
+
+LDsb_f1          111 .... 10010 .... ................         @op_rd_rp_disp16
+LDsb_f2          111 .... 00000 .... 0000 0110 00 .. ....     @op_rd_rx_ry_sa
+LDsbc            111 .... 11111 .... .... 011 .........       @op_rd_rp_cond4_disp9
+
+LDub_f1          000 .... 10011 ....                          @op_rd4_rp
+LDub_f2          000 .... 10111 ....                          @op_rd4_rp
+LDub_f3          000 .... 11 ... ....                         @op_rd_rp_disp3
+LDUB_f4          111 .... 10011 .... ................         @op_rd_rp_disp16
+LDub_f5          111 .... 00000 .... 0000 0111 00 .. ....     @op_rd_rx_ry_sa
+LDUBc            111 .... 11111 .... .... 100 .........       @op_rd_rp_cond4_disp9
+
+LDSH_f1          000 .... 10001 ....                          @op_rd4_rp
+LDSH_f2          000 .... 10101 ....                          @op_rd4_rp
+LDSH_f3          100 .... 00 ... ....                         @op_rd_rp_disp3
+LDSH_f4          111 .... 10000 .... ................         @op_rd_rp_disp16
+LDSH_f5          111 .... 00000 .... 0000 0100 00 .. ....     @op_rd_rx_ry_sa
+
+LDUH_f1          000 .... 10010 ....                          @op_rd4_rp
+LDUH_f2          000 .... 10110 ....                          @op_rd4_rp
+LDUH_f3          100 .... 01 ... ....                         @op_rd_rp_disp3
+LDUH_f4          111 .... 10001 ....  ................        @op_rd_rp_disp16
+LDUH_f5          111 .... 00000 ....  0000 0101 00 .. ....    @op_rd_rx_ry_sa
+LDUHc            111 .... 11111 .... .... 010 .........       @op_rd_rp_cond4_disp9
+
+LDSHc            111 .... 11111 .... .... 001 .........       @op_rd_rp_cond4_disp9
+LDW_f1           000 .... 10000 ....                          @op_rd4_rp
+LDW_f2           000 .... 10100 ....                          @op_rd4_rp
+LDW_f3           011 .... ..... ....                          @op_rd_disp5_rp
+LDW_f4           111 .... 01111 .... ................         @op_rd_rp_disp16
+LDW_f5           111 .... 00000 .... 0000 0011 00 .. ....     @op_rd_rx_ry_sa
+LDW_f6           111 .... 00000 .... 0000 111110 . . ....     @op_rx_ry_x_y_rd
+LDWc             111 .... 11111 .... .... 000 .........       @op_rd_rp_cond4_disp9
+
+# LDC is processors depending
+
+# LDDPC - Load PC-relative with Displaceme: Rd, PC[disp]
+LDDPC_rd        010 01 ....... ....                          @op_rd_disp
+LDDSP_rd_disp   010 00 ....... ....                          @op_rd_disp
+
+LDINSB          111 .... 11101 .... 01 .. ............       @op_ldinsb
+LDINSH          111 .... 11101 .... 000 . ............       @op_ldinsh
+
+LDM             111 000 . 11100 .... ................       @op_stm
+
+LDMTS           111 001 . 11100 .... ................       @op_stm
+
+LDSWPSH         111 .... 11101 .... 0010 ............        @op_rp_rd_disp12
+LDSWPUH         111 .... 11101 .... 0011 ............        @op_rp_rd_disp12
+LDSWPW          111 .... 11101 .... 1000 ............        @op_rp_rd_disp12
+
+
+LSL_f1          111 .... 00000 .... 0000 1001 0100 ....     @op_rd_rx_ry
+LSL_f2          101 .... 1011 . ....                        @op_rd_bp4_bp1
+LSL_f3          111 .... 00000 .... 0001 0101 000 .....     @op_rd_rs_sa5
+LSR_f1          111 .... 00000 .... 0000 1010 0100 ....     @op_rd_rx_ry
+LSR_f2          101 .... 1100 . ....                        @op_rd_bp4_bp1
+LSR_f3          111 .... 00000 .... 0001 0110 000 .....     @op_rd_rs_sa5
+
+MACHHD          111 .... 00000 .... 0000 0101 10 . . ....   @op_rx_ry_x_y_rd
+MACHHW          111 .... 00000 .... 0000 0100 10 . . ....   @op_rx_ry_x_y_rd
+
+MAC_rd_rx_ry    111 .... 00000 .... 0000 0011 0100 ....     @op_rd_rx_ry
+MACUd           111 .... 00000 .... 0000 0111 0100 ....     @op_rd_rx_ry
+MACSD_rd_rx_ry  111 .... 00000 .... 0000 0101 0100 ....     @op_rd_rx_ry
+
+MAX_rd_rx_ry    111 .... 00000 .... 0000 1100 0100 ....     @op_rd_rx_ry
+
+MCALL_rp_disp   111 100000001 .... ................         @op_rp_disp
+
+MEMC_bp5_imm15  111 101100001 ..... ...............         @op_bp5_imm15
+MEMS_bp5_imm15  111 110000001 ..... ...............         @op_bp5_imm15
+MEMT_bp5_imm15  111 110100001 ..... ...............         @op_bp5_imm15
+
+MFSR_rd_sr      111 000011011 .... 00000000 ........        @op_rd_sr
+
+# TODO: verify, instruction set reference contains error in opcode
+MIN_rd_rx_ry    111 .... 00000 .... 0000 11010100 ....      @op_rd_rx_ry
+
+MOV_rd_imm8     001 1 ........ ....                         @op_rd_imm8
+MOV_rd_imm21    111 .... 0011 . .... ................       @op_rd_imm21
+MOV_rd_rs       000 .... 01001 ....                         @op_rs_rd
+MOV_rd_imm_cond4  111 1100 11011 .... 0000 .... ........    @op_rd_cond4_imm8
+MOV_cod_f1      111 .... 00000 .... 0001 0111 .... 0000     @op_rd_rs_cond4
+
+MOVH_rd_imm16   111 111000001 .... ................         @op_rd_imm16
+MTDR            111 001111011 .... 00000000 ........        @op_mtdr
+MTSR_rs_sr      111 000111011 .... 00000000 ........        @op_rs_sr
+
+MUL_rd_rs       101 .... 10011 ....                         @op_rs_rd
+MUL_rd_rx_ry    111 .... 00000 .... 0000 00100100 ....      @op_rd_rx_ry
+MUL_rd_rs_imm8  111 .... 00000 .... 0001 0000 ........      @op_rd_rs_imm8
+
+MULHHW          111 .... 00000 .... 00000111 10 . . ....    @op_rx_ry_x_y_rd
+MULUD           111 .... 00000 .... 0000 01100100 ....      @op_rd_rx_ry
+
+
+MUSFR_rs        010 111010011 ....                          @op_rs
+MUSTR_rd        010 111010010 ....                          @op_rd
+
+NEG_rd          010 111000011 ....                          @op_rd
+NOP             1101011 10000 0011                          @op_nop
+
+OR_rs_rd        000 .... 00100 ....                         @op_rs_rd
+OR_f2           111 .... 11110 .... 0001000 ..... ....      @op_rd_rx_ry_sa5
+OR_f3           111 .... 11110 .... 0001001 ..... ....      @op_rd_rx_ry_sa5
+ORH             111 010100001 .... ................         @op_rd_imm16
+ORL             111 010000001 .... ................         @op_rd_imm16
+
+POPM            110 1 ......... 010                          @op_popm
+PUSHM           110 1 ........ 0001                         @op_pushm
+
+RCALL_disp10    110 0 ........ 11 ..                        @op_disp8_disp2
+
+RET             010 1111 0 .... ....                        @op_rd_cond4
+RETE            1101011 00000 0011
+RETS            1101011 00001 0011
+
+RJMP            110 0 ........ 10 ..                        @op_disp8_disp2
+
+ROL_rd          010 111001111 ....                          @op_rd
+ROR_rd          010 111010000 ....                          @op_rd
+
+RSUB_f1         000 .... 00010 ....                         @op_rs_rd
+RSUB_rd_rs_imm8 111 .... 00000 .... 0001 0001 ........      @op_rd_rs_imm8
+RSUBc           111 1101 11011 .... 0000 .... ........      @op_rd_cond4_imm8
+
+SATU            111 1000 11011 .... 0000 01 ..... .....     @op_rd_bp5_sa5
+
+SBC             111 .... 00000 .... 0000 0001 0100 ....     @op_rd_rx_ry
+SBR             101 .... 1101 . ....                        @op_rd_bp4_bp1
+
+SCALL           1101011 10011 0011
+SCR             010 111000001 ....                          @op_rd
+
+SLEEP           111 0100 11011 0000 00000000 ........       @op_op8
+
+SR              010 11111 .... ....                         @op_rd_cond4
+
+SSRF            1101001 ..... 0011                          @op_bp5
+
+STB_rp_rs       000 .... 01100 ....                         @op_rp_rs
+STB_f2          000 .... 01111 ....                         @op_rp_rs
+STB_f3          101 .... 01 ... ....                        @op_rd_rp_disp3
+STB_f4          111 .... 10110 .... ................        @op_rp_rs_imm16
+STB_f5          111 .... 00000 .... 0000 1011 00 .. ....    @op_rd_rx_ry_sa
+STBc            111 .... 11111 .... .... 111 .........      @op_rd_rp_cond4_disp9
+
+STD_rs_rp       101 .... 100 10 ... 0                       @op_rp_rs3
+STD_f2          101 .... 100 10 ... 1                       @op_rp_rs3
+STD_rp_rs_disp  111 .... 01110 ... 1 ................       @op_rp_rs_disp16
+STDSP           010 10 ....... ....                         @op_rd_disp
+
+STH_f1          000 .... 01011 ....                         @op_rp_rs
+STH_f2          000 .... 01110 ....                         @op_rp_rs
+STH_f3          101 .... 00 ... ....                        @op_rd_rp_disp3
+STH_f4          111 .... 10101 .... ................        @op_rp_rs_imm16
+STH_f5          111 .... 00000 .... 0000 1010 00 .. ....    @op_rd_rx_ry_sa
+STHc            111 .... 11111 .... .... 110 .........      @op_rd_rp_cond4_disp9
+STM             111 010 . 11100 .... ................       @op_stm
+
+STW_f1          000 .... 01010 ....                         @op_rp_rs
+STW_f2          000 .... 01101 ....                         @op_rp_rs
+STW_rp_rs_disp4 100 .... 1 .... ....                        @op_rs_rp_disp4
+STW_f4          111 .... 10100 .... ................        @op_rp_rs_imm16
+STW_f5          111 .... 00000 .... 0000 1001 00 .. ....    @op_rd_rx_ry_sa
+STWcond         111 .... 11111 .... .... 101 .........      @op_rd_rp_cond4_disp9
+
+SUB_rd_rs       000 .... 00001 ....                         @op_rs_rd
+SUB_rd_imm8     001 0 ........ ....                         @op_rd_imm8
+SUB_rd_rx_ry_sa 111 .... 00000 .... 0000 0001 00 .. ....    @op_rd_rx_ry_sa
+SUB_rd_imm21    111 .... 0001 . .... ................       @op_rd_imm21
+SUB_rs_rd_imm   111 .... 01100 .... ................        @op_rs_rd_imm16
+SUBc_f1         111 101 . 11011 .... 0000 .... ........     @op_rd_f_cond4_imm8
+SUBc_f2         111 .... 11101 .... 1110 .... 0001 ....     @op_rd_rx_ry_cond4
+TNBZ            010 1110 01110 ....                         @op_rd
+TST             000 .... 00111 ....                         @op_rs_rd

@@ -48,6 +48,7 @@ source watchdog/Kconfig
 source arm/Kconfig
 source alpha/Kconfig
 source avr/Kconfig
+source avr32/Kconfig
 source cris/Kconfig
 source hppa/Kconfig
 source i386/Kconfig
