@@ -11,7 +11,7 @@ avr32_ss.add(files(
   'cpu.c',
   'disas.c',
   'helper.c',
-  'helper_conditions_sflags.c',
+  'helper_conditions.c',
   'translate.c'
   ))
 
