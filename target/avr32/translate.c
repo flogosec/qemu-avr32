@@ -106,6 +106,41 @@ void avr32_tcg_init(void)
     }
 }
 
+// Decode helper required only if insn wide is variable
+static uint32_t decode_insn_load_bytes(DisasContext *ctx, uint32_t insn,
+                                       int i, int n){
+    if(i == 0){
+        insn = cpu_lduw_be_data(ctx->env, ctx->base.pc_next + i) << 16;
+    }
+    else if (i== 2){
+        insn |= cpu_lduw_be_data(ctx->env, ctx->base.pc_next + i);
+    }
+
+    //No instruction was loaded.
+    if(insn == 0x0){
+        gen_helper_raise_illegal_instruction(cpu_env);
+    }
+    return insn;
+}
+
+static void gen_goto_tb(DisasContext* ctx, int n, target_ulong dest){
+    if (translator_use_goto_tb(&ctx->base, dest)) {
+        tcg_gen_goto_tb(n);
+        tcg_gen_movi_i32(cpu_r[PC_REG], dest);
+        tcg_gen_exit_tb(ctx->base.tb, n);
+    } else {
+
+        tcg_gen_movi_i32(cpu_r[PC_REG], dest);
+        tcg_gen_lookup_and_goto_ptr();
+    }
+    ctx->base.is_jmp = DISAS_CHAIN;
+}
+
+
+static uint32_t decode_insn_load(DisasContext *ctx);
+static bool decode_insn(DisasContext *ctx, uint32_t insn);
+#include "decode-insn.c.inc"
+
 static int sign_extend_8(int number){
     if((number >> 7) == 1){
         number |= 0xFFFFFF00;
@@ -4022,43 +4057,6 @@ static bool trans_TST(DisasContext *ctx, arg_TST *a){
     ctx->base.pc_next += 2;
     return true;
 }
-
-
-// Decode helper required only if insn wide is variable
-static uint32_t decode_insn_load_bytes(DisasContext *ctx, uint32_t insn,
-                                       int i, int n){
-    if(i == 0){
-        insn = cpu_lduw_be_data(ctx->env, ctx->base.pc_next + i) << 16;
-    }
-    else if (i== 2){
-        insn |= cpu_lduw_be_data(ctx->env, ctx->base.pc_next + i);
-    }
-
-    //No instruction was loaded.
-    if(insn == 0x0){
-        gen_helper_raise_illegal_instruction(cpu_env);
-    }
-    return insn;
-}
-
-static void gen_goto_tb(DisasContext* ctx, int n, target_ulong dest){
-    if (translator_use_goto_tb(&ctx->base, dest)) {
-        tcg_gen_goto_tb(n);
-        tcg_gen_movi_i32(cpu_r[PC_REG], dest);
-        tcg_gen_exit_tb(ctx->base.tb, n);
-    } else {
-
-        tcg_gen_movi_i32(cpu_r[PC_REG], dest);
-        tcg_gen_lookup_and_goto_ptr();
-    }
-    ctx->base.is_jmp = DISAS_CHAIN;
-}
-
-
-static uint32_t decode_insn_load(DisasContext *ctx);
-static bool decode_insn(DisasContext *ctx, uint32_t insn);
-#include "decode-insn.c.inc"
-
 
 static void avr32_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
 {
