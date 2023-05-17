@@ -1,5 +1,5 @@
 /*
- * QEMU AVR32 Boot
+ * QEMU AVR32 INTC
  *
  * Copyright (c) 2023, Florian Göhler, Johannes Willbold
  *
@@ -18,26 +18,38 @@
  * <http://www.gnu.org/licenses/lgpl-2.1.html>
  */
 
-#ifndef HW_AVR32_BOOT_H
-#define HW_AVR32_BOOT_H
+#ifndef QEMU_AVR32_AVR32_TWIM_H
+#define QEMU_AVR32_AVR32_TWIM_H
 
-#include "hw/boards.h"
-#include "cpu.h"
+#include "hw/sysbus.h"
+#include "qom/object.h"
+#include "hw/irq.h"
+#include "qemu/timer.h"
+#include "hw/i2c/i2c.h"
+#include "at32uc3_pdca.h"
 
-/**
- * avr32_load_firmware:   load an image into a memory region
- *
- * @cpu:        Handle a AVR CPU object
- * @ms:         A MachineState
- * @mr:         Memory Region to load into
- * @firmware:   Path to the firmware file (raw binary or ELF format)
- *
- * Load a firmware supplied by the machine or by the user  with the
- * '-bios' command line option, and put it in target memory.
- *
- * Returns: true on success, false on error.
- */
-bool avr32_load_firmware(AVR32ACPU *cpu, MachineState *ms,
-                         MemoryRegion *mr, const char *firmware);
 
-#endif // HW_AVR32_BOOT_H
+#define TYPE_AT32UC3_TWIM "at32uc3.twim"
+OBJECT_DECLARE_SIMPLE_TYPE(AT32UC3TWIMState, AT32UC3_TWIM)
+
+struct AT32UC3TWIMState {
+    SysBusDevice parent_obj;
+
+    MemoryRegion mmio;
+    I2CBus* bus;
+    qemu_irq irq;
+    AT32UC3PDCAState* pdca;
+    int pdca_recv_pid;
+    int pdca_send_pid;
+
+    uint32_t cr;
+    uint32_t cwgr;
+    uint32_t smbtr;
+    uint32_t cmdr;
+    uint32_t ncmdr;
+    uint8_t rhr;
+    uint32_t sr;
+    uint32_t imr;
+};
+
+#endif //QEMU_AVR32_AVR32_TWIM_H

@@ -26,6 +26,7 @@
 #include "hw/core/tcg-cpu-ops.h"
 #include "exec/address-spaces.h"
 #include "exec/helper-proto.h"
+#include "hw/avr32/at32uc3_intc.h"
 
 static AVR32ACPU * cpu_self;
 static bool first_reset = true;
@@ -83,7 +84,6 @@ static void avr32_cpu_reset(DeviceState *dev)
     AVR32ACPUClass* acc = AVR32A_CPU_GET_CLASS(dev);
     CPUAVR32AState* env = &cpu->env;
 
-    env->isInInterrupt = 0;
     env->intlevel = 0;
     env->intsrc = -1;
     acc->parent_reset(dev);
@@ -111,9 +111,6 @@ static void avr32_cpu_reset(DeviceState *dev)
     for(int i= 0; i< AVR32A_REG_PAGE_SIZE; i++){
         env->r[i] = 0;
     }
-
-    printf("RESET 2\n");
-
     env->r[AVR32A_PC_REG] = 0xd0000000;
     env->r[AVR32A_LR_REG] = 0;
     env->r[AVR32A_SP_REG] = 0;
@@ -123,7 +120,7 @@ static ObjectClass* avr32_cpu_class_by_name(const char *cpu_model)
 {
     ObjectClass *oc;
     printf("[AVR32-TODO] avr32_cpu_class_by_name: %s\n", cpu_model);
-    oc = object_class_by_name(AVR32A_CPU_TYPE_NAME("AVR32EXPC"));
+    oc = object_class_by_name(AVR32A_CPU_TYPE_NAME("AT32UC3C"));
     return oc;
 }
 static bool avr32_cpu_has_work(CPUState *cs)
@@ -164,9 +161,31 @@ static void avr32_cpu_set_pc(CPUState *cs, vaddr value)
     cpu->env.r[AVR32A_PC_REG] = value;
 }
 
-static bool avr32_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+static bool avr32_cpu_exec_interrupt(CPUState *cs, int int_req)
 {
-    //TODO: Later
+    CPUClass *cc = CPU_GET_CLASS(cs);
+    AVR32ACPU *cpu = AVR32A_CPU(cs);
+    CPUAVR32AState *env = &cpu->env;
+
+    // TODO:
+    // DOCUMENTATION EXCERPT:
+    // When the CPU receives an interrupt request it checks if any other exceptions are pending. If no
+    // exceptions of higher priority are pending, interrupt handling is initiated.
+
+    if(int_req & CPU_INTERRUPT_HARD) {
+        uint32_t pending_intc_prio_reg = avr32_intc_get_pending_intr(env->intc);
+        if(pending_intc_prio_reg != 0xffffffff) {
+            cpu->env.intlevel = (pending_intc_prio_reg & AT32UC3_INTC_IPR_INTLEVEL) >> 30;
+            cpu->env.autovector = pending_intc_prio_reg & AT32UC3_INTC_IPR_AUTOVECTOR;
+
+            cs->exception_index = AVR32_EXCP_IRQ;
+            cc->tcg_ops->do_interrupt(cs);
+            return true;
+        } else {
+        }
+
+    }
+
     return false;
 }
 
@@ -218,10 +237,10 @@ static void avr32b_cpu_class_init(ObjectClass *oc, void *data)
 
 static const AVR32ACPUDef avr32_cpu_defs[] = {
         {
-                .name = "AVR32EXPC",
+                .name = "AT32UC3C",
                 .parent_microarch = TYPE_AVR32A_CPU,
-                .core_type = AVR32_EXP,
-                .series_type = AVR32_EXP_S,
+                .core_type = AVR32_UC3,
+                .series_type = AVR32UC3_C,
                 .clock_speed = 66 * 1000 * 1000, /* 66 MHz */
                 .audio = false,
                 .aes = false

@@ -1,7 +1,7 @@
 /*
- * QEMU AVR32 Example board
+ * QEMU AVR32 CAN
  *
- * Copyright (c) 2022-2023 Florian Göhler
+ * Copyright (c) 2023, Florian Göhler, Johannes Willbold
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,26 +17,29 @@
  * License along with this library; if not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>
  */
-#ifndef HW_AVR32_AVR32EXPC_H
-#define HW_AVR32_AVR32EXPC_H
 
-#include "target/avr32/cpu.h"
-#include "qom/object.h"
+#ifndef QEMU_AVR32_AVR32_CAN_H
+#define QEMU_AVR32_AVR32_CAN_H
+
 #include "hw/sysbus.h"
+#include "qom/object.h"
+#include "hw/irq.h"
 
-#define TYPE_AVR32EXP_MCU "AVR32EXP"
-#define TYPE_AVR32EXPS_MCU "AVR32EXPS"
 
-typedef struct AVR32EXPMcuState AVR32EXPMcuState;
-DECLARE_INSTANCE_CHECKER(AVR32EXPMcuState, AVR32EXP_MCU, TYPE_AVR32EXP_MCU)
+#define TYPE_AT32UC3_CAN "at32uc3.can"
+OBJECT_DECLARE_SIMPLE_TYPE(AT32UC3CANState, AT32UC3_CAN)
 
-struct AVR32EXPMcuState {
-    /*< private >*/
+struct AT32UC3CANState {
     SysBusDevice parent_obj;
 
-    /*< public >*/
-    AVR32ACPU cpu;
-    MemoryRegion flash;
+    MemoryRegion mmio;
+
+    qemu_irq irq;
+    int irqline;
+
+    uint8_t num_cs;
+    qemu_irq *cs_lines;
+
 };
 
-#endif // HW_AVR32_AVR32EXPC_H
+#endif //QEMU_AVR32_AVR32_CAN_H

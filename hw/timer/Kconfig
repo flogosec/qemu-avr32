@@ -60,3 +60,7 @@ config STELLARIS_GPTM
 
 config AVR_TIMER16
     bool
+
+config AT32UC3_TIMER
+    bool
+    select PTIMER

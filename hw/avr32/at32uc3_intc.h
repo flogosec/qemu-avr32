@@ -1,5 +1,5 @@
 /*
- * QEMU AVR32 Boot
+ * QEMU AVR32 INTC
  *
  * Copyright (c) 2023, Florian Göhler, Johannes Willbold
  *
@@ -18,26 +18,35 @@
  * <http://www.gnu.org/licenses/lgpl-2.1.html>
  */
 
-#ifndef HW_AVR32_BOOT_H
-#define HW_AVR32_BOOT_H
+#ifndef QEMU_AVR32_AVR32_INTC_H
+#define QEMU_AVR32_AVR32_INTC_H
 
-#include "hw/boards.h"
-#include "cpu.h"
+#include "hw/sysbus.h"
+#include "qom/object.h"
+#include "hw/irq.h"
+#include "target/avr32/cpu.h"
 
-/**
- * avr32_load_firmware:   load an image into a memory region
- *
- * @cpu:        Handle a AVR CPU object
- * @ms:         A MachineState
- * @mr:         Memory Region to load into
- * @firmware:   Path to the firmware file (raw binary or ELF format)
- *
- * Load a firmware supplied by the machine or by the user  with the
- * '-bios' command line option, and put it in target memory.
- *
- * Returns: true on success, false on error.
- */
-bool avr32_load_firmware(AVR32ACPU *cpu, MachineState *ms,
-                         MemoryRegion *mr, const char *firmware);
+#define AT32UC3_INTC_IPR_INTLEVEL 0b11 << 30
+#define AT32UC3_INTC_IPR_AUTOVECTOR ((1 << 14) - 1)
 
-#endif // HW_AVR32_BOOT_H
+#define TYPE_AT32UC3_INTC "at32uc3.intc"
+OBJECT_DECLARE_SIMPLE_TYPE(AT32UC3INTCState, AT32UC3_INTC)
+
+struct AT32UC3INTCState {
+    SysBusDevice parent_obj;
+
+    MemoryRegion mmio;
+    qemu_irq irq;
+    AVR32ACPU* cpu;
+
+    uint32_t priority_regs[64];
+    uint32_t request_regs[64];
+    uint8_t cause[4];
+
+    uint64_t grp_req_lines;
+    uint64_t val_req_lines;
+};
+
+uint32_t avr32_intc_get_pending_intr(AT32UC3INTCState* intc);
+
+#endif //QEMU_AVR32_AVR32_INTC_H

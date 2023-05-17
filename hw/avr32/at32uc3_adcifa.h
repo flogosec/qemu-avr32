@@ -1,5 +1,5 @@
 /*
- * QEMU AVR32 Boot
+ * QEMU AVR32 ADCIFA
  *
  * Copyright (c) 2023, Florian Göhler, Johannes Willbold
  *
@@ -17,27 +17,28 @@
  * License along with this library; if not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>
  */
+#ifndef QEMU_AVR32_AVR32_ADCIFA_H
+#define QEMU_AVR32_AVR32_ADCIFA_H
 
-#ifndef HW_AVR32_BOOT_H
-#define HW_AVR32_BOOT_H
+#include "hw/sysbus.h"
+#include "qom/object.h"
+#include "hw/irq.h"
 
-#include "hw/boards.h"
-#include "cpu.h"
 
-/**
- * avr32_load_firmware:   load an image into a memory region
- *
- * @cpu:        Handle a AVR CPU object
- * @ms:         A MachineState
- * @mr:         Memory Region to load into
- * @firmware:   Path to the firmware file (raw binary or ELF format)
- *
- * Load a firmware supplied by the machine or by the user  with the
- * '-bios' command line option, and put it in target memory.
- *
- * Returns: true on success, false on error.
- */
-bool avr32_load_firmware(AVR32ACPU *cpu, MachineState *ms,
-                         MemoryRegion *mr, const char *firmware);
+#define TYPE_AT32UC3_ADCIFA "at32uc3.adcifa"
+OBJECT_DECLARE_SIMPLE_TYPE(AT32UC3ADCIFAState, AT32UC3_ADCIFA)
 
-#endif // HW_AVR32_BOOT_H
+struct AT32UC3ADCIFAState {
+    SysBusDevice parent_obj;
+
+    MemoryRegion mmio;
+
+    qemu_irq irq;
+    int irqline;
+
+    uint8_t num_cs;
+    qemu_irq *cs_lines;
+
+};
+
+#endif //QEMU_AVR32_AVR32_ADCIFA_H

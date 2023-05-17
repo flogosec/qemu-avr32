@@ -1,7 +1,7 @@
 /*
  * QEMU AVR32 Boot
  *
- * Copyright (c) 2022-2023 Florian Göhler, Johannes Willbold
+ * Copyright (c) 2023, Florian Göhler, Johannes Willbold
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,10 +17,13 @@
  * License along with this library; if not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>
  */
+
 #include "qemu/osdep.h"
 #include "qemu/datadir.h"
 #include "hw/loader.h"
+#include "elf.h"
 #include "boot.h"
+#include "qemu/log.h"
 #include "qemu/error-report.h"
 
 bool avr32_load_firmware(AVR32ACPU *cpu, MachineState *ms,
@@ -35,7 +38,7 @@ bool avr32_load_firmware(AVR32ACPU *cpu, MachineState *ms,
         return false;
     }
 
-    printf("[AVR32-BOOT]: Loading firmware images as raw binary\n");
+    printf("[AT32UC3-BOOT]: Loading firmware images as raw binary\n");
     bytes_loaded = load_image_mr(filename, program_mr);
 
     if (bytes_loaded < 0) {
@@ -44,7 +47,7 @@ bool avr32_load_firmware(AVR32ACPU *cpu, MachineState *ms,
         return false;
     }
 
-    printf("[AVR32-BOOT]: Loaded boot image successfully\n");
+    printf("[AT32UC3-BOOT]: Loaded boot image successfully\n");
 
     return true;
 }

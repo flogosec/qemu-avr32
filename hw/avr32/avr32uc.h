@@ -1,5 +1,5 @@
 /*
- * QEMU AVR32 Boot
+ * QEMU AVR32 AVR32UC
  *
  * Copyright (c) 2023, Florian Göhler, Johannes Willbold
  *
@@ -17,27 +17,23 @@
  * License along with this library; if not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>
  */
+#ifndef HW_AVR32_AVR32UC_H
+#define HW_AVR32_AVR32UC_H
 
-#ifndef HW_AVR32_BOOT_H
-#define HW_AVR32_BOOT_H
+#include "hw/sysbus.h"
 
-#include "hw/boards.h"
-#include "cpu.h"
+#include "target/avr32/cpu.h"
 
-/**
- * avr32_load_firmware:   load an image into a memory region
- *
- * @cpu:        Handle a AVR CPU object
- * @ms:         A MachineState
- * @mr:         Memory Region to load into
- * @firmware:   Path to the firmware file (raw binary or ELF format)
- *
- * Load a firmware supplied by the machine or by the user  with the
- * '-bios' command line option, and put it in target memory.
- *
- * Returns: true on success, false on error.
- */
-bool avr32_load_firmware(AVR32ACPU *cpu, MachineState *ms,
-                         MemoryRegion *mr, const char *firmware);
+#define TYPE_AVR32UC "avr32uc"
+typedef struct AVR32UCState AVR32UCState;
+OBJECT_DECLARE_SIMPLE_TYPE(AVR32UCState, AVR32UC)
 
-#endif // HW_AVR32_BOOT_H
+struct AVR32UCState {
+    /*< private >*/
+    SysBusDevice parent_obj;
+
+    /*< public >*/
+    AVR32ACPU cpu;
+};
+
+#endif //HW_AVR32_AVR32UC_H

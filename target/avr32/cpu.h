@@ -23,8 +23,10 @@
 #include "cpu-qom.h"
 #include "exec/cpu-defs.h"
 
-#define AVR32_EXP 0x100
-#define AVR32_EXP_S    AVR32_EXP | 0x30
+#define AVR32_UC3 0x100
+#define AVR32UC3_C    AVR32_UC3 | 0x30
+
+
 
 #define AVR32A_REG_PAGE_SIZE 16 // r0 - r12 + LR + SP + PC
 #define AVR32A_PC_REG 15
@@ -32,7 +34,8 @@
 #define AVR32A_SP_REG 13
 #define AVR32A_SYS_REG 256
 
-
+#define AVR32_EXCP_IRQ 1 // EXCP_INTERRUPT
+#define AVR32_EXCP_EXCP 2
 
 struct AVR32ACPUDef {
     const char* name;
@@ -68,7 +71,8 @@ static const char avr32_cpu_sr_flag_names[32][8] = {
         "sregM1",
         "sregM2", "sreg25","sregD","sregDM","sregJ","sregH", "sreg30", "sregSS"
 };
-
+struct AT32UC3INTCState;
+typedef struct AT32UC3INTCState AT32UC3INTCState;
 typedef struct CPUArchState {
     // Status Register
     uint sr;
@@ -87,6 +91,7 @@ typedef struct CPUArchState {
     int intlevel;
     uint64_t autovector;
     int isInInterrupt;
+    AT32UC3INTCState* intc;
 
 } CPUAVR32AState;
 

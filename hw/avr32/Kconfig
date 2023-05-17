@@ -1,6 +1,81 @@
-config AVR32EXP_MCU
+config AT32UC3_MCU
     bool
 
-config AVR32EXAMPLE_BOARD
+config AT32UC3_TWIM
     bool
-    select AVR32EXP_MCU
+
+config AT32UC3_TWIS
+    bool
+
+config AT32UC3_PDCA
+    bool
+
+config AT32UC3_ADCIFA
+    bool
+
+config AT32UC3_UART
+    bool
+
+config AT32UC3_CAN
+    bool
+
+config AT32UC3_FL512S
+    bool
+
+config AT32UC3_SCIF
+    bool
+
+config AT32UC3_INTC
+    bool
+
+config AT32UC3_TWI
+    bool
+    select I2C
+
+config MPU3300
+    bool
+    select I2C
+
+config HMC5843
+    bool
+    select I2C
+
+config RM3100
+    bool
+    select I2C
+
+config HTPA16X4
+    bool
+    select I2C
+
+config HTPA16X4_EEPROM
+    bool
+    select I2C
+
+config GSSB_ISTAGE
+    bool
+    select I2C
+
+config FM33256B
+    bool
+    select SSI
+
+config NANOPOWER_P31U
+    bool
+    select I2C
+
+config NANOMIND_A3200
+    bool
+    select AT32UC3_MCU
+    select AT32UC3_SPI
+    select AT32UC3_TWI
+    select AT32UC3_TIMER
+    select SSI_M25P80
+    select MPU3300
+    select HMC5843
+    select RM3100
+    select HTPA16X4
+    select HTPA16X4_EEPROM
+    select GSSB_ISTAGE
+    select FM33256B
+    select NANOPOWER_P31U
