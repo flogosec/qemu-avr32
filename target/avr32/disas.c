@@ -101,16 +101,17 @@ static bool trans_##opcode(DisasContext *pctx, arg_##opcode * a)        \
 
 #define REG(x) avr32_cpu_r_names[x]
 
-INSN(ABS_r,    ABS,      "%s",                              REG(a->rd))
-INSN(ACALL_d,    ACALL,      "%s",                          REG(a->disp))
+INSN(ABS,    ABS,      "%s",                              REG(a->rd))
+INSN(ACALL,    ACALL,      "%s",                          REG(a->disp))
 
-INSN(ACR_r,    ACR,       "%s",                             REG(a->rd))
-INSN(ADD_rd_rx_ry_sa,    ADC,      "%s, %s, %s",            REG(a->rd), REG(a->rx), REG(a->ry))
-INSN(ADC_rrr,    ADC,      "%s, %s, %s",                    REG(a->rd), REG(a->rx), REG(a->ry))
-INSN(ADD_rd_rs,    ADD,      "%s, %s",                      REG(a->rd), REG(a->rs))
-INSN(ADDCOND4_rrcr,    ADDCOND4,  "%s, %s, [0x%04x], %s",   REG(a->rx), REG(a->ry), a->cond, REG(a->rd))
-INSN(ADDABS_rrr,    ADDABS,      "%s, %s, %s",              REG(a->rd), REG(a->rx), REG(a->ry))
-INSN(ADDHHW_rrxyr,    ADDHHW,    "%s, %s, %s, %s, %s",      REG(a->rd), REG(a->rx), REG(a->x), REG(a->y), REG(a->rd))
+INSN(ACR,    ACR,      "%s",                                REG(a->rd))
+INSN(ADC,    ADC,      "%s, %s, %s",                        REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(ADD_f1,    ADD,   "%s, %s",                            REG(a->rd), REG(a->rs))
+INSN(ADD_f2,    ADC,   "%s, %s, %s",                        REG(a->rd), REG(a->rx), REG(a->ry))
+
+INSN(ADD_cond,         ADD_cond,  "%s, %s, [0x%04x], %s",   REG(a->rx), REG(a->ry), a->cond, REG(a->rd))
+INSN(ADDABS,           ADDABS,      "%s, %s, %s",           REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(ADDHHW,     ADDHHW,    "%s, %s, %s, %s, %s",     REG(a->rd), REG(a->rx), REG(a->x), REG(a->y), REG(a->rd))
 
 INSN(AND_rr,    AND,      "%s, %s",                         REG(a->rd), REG(a->rs))
 INSN(AND_f2,    AND,      "%s, %s, %s, 02%04x",             REG(a->rd), REG(a->rx), REG(a->ry), a->sa5)

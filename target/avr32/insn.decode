@@ -140,17 +140,17 @@
 @op_ldinsh          ... rp:4 ..... rd:4 ... part:1 disp12:12    &ldinsh
 @op_rp_rd_disp12    ... rp:4 ..... rd:4 .... disp12:12          &rp_rd_disp12
 
-ABS_r           010 1110 00100 ....                          @op_rd
-ACALL_d         110 1 ........ 0000                          @op_disp8
+ABS             010 1110 00100 ....                          @op_rd
+ACALL           110 1 ........ 0000                          @op_disp8
 
-ACR_r           010 1110 00000 ....                          @op_rd
-ADC_rrr         111 .... 00000 .... 0000 00000100 ....       @op_rd_rx_ry
-ADD_rd_rs       000 .... 00000 ....                          @op_rs_rd
-ADD_rd_rx_ry_sa 111 .... 00000 .... 0000 0000 00 .. ....     @op_rd_rx_ry_sa
-ADDCOND4_rrcr       111 .... 11101 .... 1110 .... 0000 ....       @op_rx_ry_cond_rd
-#ADD_rrir        111 .... 00000 .... 0000 0000 00 .. ....     @op_rx_ry_imm_rd
-ADDABS_rrr      111 .... 00000 .... 0000 11100100 ....       @op_rd_rx_ry
-ADDHHW_rrxyr    111 .... 00000 .... 0000 1110 00 . . ....      @op_rx_ry_x_y_rd
+ACR             010 1110 00000 ....                          @op_rd
+ADC             111 .... 00000 .... 0000 00000100 ....       @op_rd_rx_ry
+ADD_f1          000 .... 00000 ....                          @op_rs_rd
+ADD_f2          111 .... 00000 .... 0000 0000 00 .. ....     @op_rd_rx_ry_sa
+ADD_cond        111 .... 11101 .... 1110 .... 0000 ....      @op_rx_ry_cond_rd
+#ADD_rrir       111 .... 00000 .... 0000 0000 00 .. ....     @op_rx_ry_imm_rd
+ADDABS          111 .... 00000 .... 0000 11100100 ....       @op_rd_rx_ry
+ADDHHW          111 .... 00000 .... 0000 1110 00 . . ....    @op_rx_ry_x_y_rd
 
 AND_rr          000 .... 00110 ....                          @op_rs_rd
 AND_f2          111 .... 11110 .... 0000000 ..... ....      @op_rd_rx_ry_sa5
