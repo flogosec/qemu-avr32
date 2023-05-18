@@ -210,11 +210,11 @@ CPC_f1          111 .... 00000 .... 0001 0011 00000000         @op_rs_rd_32
 CPC_f2          010 1110 00010 ....                            @op_rd
 
 # CSRF - Clear Status Register Flag: RS
-CSRF_sr         11010 10 ..... 0011                           @op_bp5
-CSRFCZ_sr       11010 00 ..... 0011                           @op_bp5
+CSRF            11010 10 ..... 0011                           @op_bp5
+CSRFCZ          11010 00 ..... 0011                           @op_bp5
 
-DIVS_rd_rx_ry   111 .... 00000 .... 0000 1100 0000 ....       @op_rd_rx_ry
-DIVU_rd_rx_ry   111 .... 00000 .... 0000 1101 0000 ....       @op_rd_rx_ry
+DIVS            111 .... 00000 .... 0000 1100 0000 ....       @op_rd_rx_ry
+DIVU            111 .... 00000 .... 0000 1101 0000 ....       @op_rd_rx_ry
 
 EOR_rd_rs       000 .... 00101 ....                           @op_rs_rd
 EOR_f2          111 .... 11110 .... 0010000 ..... ....        @op_rd_rx_ry_sa5

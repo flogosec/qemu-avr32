@@ -1009,14 +1009,14 @@ static bool trans_CPC_f2(DisasContext *ctx, arg_CPC_f2 *a){
     return true;
 }
 
-static bool trans_CSRF_sr(DisasContext *ctx, arg_CSRF_sr *a){
+static bool trans_CSRF(DisasContext *ctx, arg_CSRF *a){
     tcg_gen_movi_i32(cpu_sflags[a->bp5], 0);
     ctx->base.pc_next += 2;
     return true;
 }
 
 //TODO: add tests
-static bool trans_CSRFCZ_sr(DisasContext *ctx, arg_CSRFCZ_sr *a){
+static bool trans_CSRFCZ(DisasContext *ctx, arg_CSRFCZ *a){
     tcg_gen_mov_i32(cpu_sflags[sflagC], cpu_sflags[a->bp5]);
     tcg_gen_mov_i32(cpu_sflags[sflagZ], cpu_sflags[a->bp5]);
 
@@ -1024,8 +1024,7 @@ static bool trans_CSRFCZ_sr(DisasContext *ctx, arg_CSRFCZ_sr *a){
     return true;
 }
 
-static bool trans_DIVS_rd_rx_ry(DisasContext *ctx, arg_DIVS_rd_rx_ry *a){
-
+static bool trans_DIVS(DisasContext *ctx, arg_DIVS *a){
     TCGv rx = tcg_temp_new_i32();
     TCGv ry = tcg_temp_new_i32();
 
@@ -1039,7 +1038,7 @@ static bool trans_DIVS_rd_rx_ry(DisasContext *ctx, arg_DIVS_rd_rx_ry *a){
     return true;
 }
 
-static bool trans_DIVU_rd_rx_ry(DisasContext *ctx, arg_DIVU_rd_rx_ry *a){
+static bool trans_DIVU(DisasContext *ctx, arg_DIVU *a){
 
     TCGv rx = tcg_temp_new_i32();
     TCGv ry = tcg_temp_new_i32();
@@ -1050,13 +1049,11 @@ static bool trans_DIVU_rd_rx_ry(DisasContext *ctx, arg_DIVU_rd_rx_ry *a){
     tcg_gen_divu_i32(cpu_r[a->rd], rx, ry);
     tcg_gen_remu_i32(cpu_r[a->rd+1], rx,ry);
 
-
     ctx->base.pc_next += 4;
     return true;
 }
 
 static bool trans_EOR_rd_rs(DisasContext *ctx, arg_EOR_rd_rs *a){
-
     tcg_gen_xor_i32(cpu_r[a->rd], cpu_r[a->rd], cpu_r[a->rs]);
     tcg_gen_setcondi_i32(TCG_COND_EQ, cpu_sflags[sflagZ], cpu_r[a->rd], 0);
     tcg_gen_shri_i32(cpu_sflags[sflagN], cpu_r[a->rd], 31);

@@ -167,11 +167,11 @@ INSN(CPW_f3,    CP.W,       "%s",                         REG(a->rd))
 INSN(CPC_f1,     CPC,        "%s, %s",                          REG(a->rd), REG(a->rs))
 INSN(CPC_f2,     CPC,           "%s",                           REG(a->rd))
 
-INSN(CSRF_sr,    CSRF,     "0x%02x",                            (a->bp5))
-INSN(CSRFCZ_sr,  CSRFCZ,   "0x%02x",                            (a->bp5))
+INSN(CSRF,              CSRF,     "0x%02x",                            (a->bp5))
+INSN(CSRFCZ,            CSRFCZ,   "0x%02x",                            (a->bp5))
 
-INSN(DIVS_rd_rx_ry,   DIVS,        "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
-INSN(DIVU_rd_rx_ry,   DIVU,        "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(DIVS,              DIVS,        "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(DIVU,              DIVU,        "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
 
 INSN(EOR_rd_rs,         EOR,       "%s, %s",                    REG(a->rd), REG(a->rs))
 INSN(EOR_f2,         EOR,          "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
