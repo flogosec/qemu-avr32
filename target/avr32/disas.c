@@ -121,7 +121,7 @@ INSN(ANDH,      ANDH,      "%s, %d",                        REG(a->rd), a->coh)
 INSN(ANDL,      ANDL,      "%s, %d",                        REG(a->rd), a->coh)
 INSN(ANDN,      ANDN,      "%s, %s",                        REG(a->rd), REG(a->rs))
 
-INSN(ASR_rrr,    ASR,      "%s, %s, %s",                    REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(ASR_f1,    ASR,      "%s, %s, %s",                    REG(a->rd), REG(a->rx), REG(a->ry))
 INSN(ASR_f2,     ASR,      "%s, 0x%04x, 0x%02x",            REG(a->rd), a->bp4, a->bp1)
 INSN(ASR_f3,     ASR,      "%s, %s, 0x%02x",                REG(a->rd), REG(a->rs), a->sa5)
 
@@ -131,8 +131,8 @@ INSN(BFINS,     BFINS,    "%s, %s, [0x%04x], [0x%04x]",       REG(a->rd), REG(a-
 
 INSN(BLD,   BLD,        "%s, 0x%04x",               REG(a->rd), a->bp5)
 
-INSN(BR_rd,     BR,        "cond3{%d}, disp: [0x%04x]",     a->rd, (a->disp))
-INSN(BR_disp,   BR,        "cond4{%d}, disp2: [0x%04x], disp1: [0x%02x], disp0: [0x%04x]",    a->cond, a->disp2, a->disp1, a->disp0)
+INSN(BR_f1,     BR,        "cond3{%d}, disp: [0x%04x]",     a->rd, (a->disp))
+INSN(BR_f2,   BR,        "cond4{%d}, disp2: [0x%04x], disp1: [0x%02x], disp0: [0x%04x]",    a->cond, a->disp2, a->disp1, a->disp0)
 
 INSN(BREAKPOINT, BRK, "BREAK");
 

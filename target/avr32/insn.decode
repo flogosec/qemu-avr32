@@ -162,7 +162,7 @@ ANDH            111 00 1 . 00001 .... ................        @op_coh_rd_imm
 ANDL            111 00 0 . 00001 .... ................        @op_coh_rd_imm
 ANDN            000 .... 01000 ....                           @op_rs_rd
 
-ASR_rrr         111 .... 00000 .... 0000 10000100 ....        @op_rd_rx_ry
+ASR_f1         111 .... 00000 .... 0000 10000100 ....        @op_rd_rx_ry
 ASR_f2          101 .... 1010 . ....                          @op_rd_bp4_bp1
 ASR_f3          111 .... 00000 .... 0001 0100 000 .....          @op_rd_rs_sa5
 
@@ -173,8 +173,8 @@ BFINS           111 .... 11101 .... 1101 00 ..... .....         @op_rd_rs_bp5_w5
 BLD             111 0110 11011 .... 00000000000 .....           @op_rd_bp5
 
 # BR{cond} - Branch if Condition Satisfied: Rd, PC[disp]
-BR_rd            1100 ........ 0 ...                            @op_rd_disp8
-BR_disp          111 .... 0100 . .... ................          @op_cond_disp21
+BR_f1            1100 ........ 0 ...                            @op_rd_disp8
+BR_f2            111 .... 0100 . .... ................          @op_cond_disp21
 
 BREAKPOINT       1101011 00111 0011
 

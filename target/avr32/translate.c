@@ -484,8 +484,7 @@ static bool trans_ANDN(DisasContext *ctx, arg_ANDN *a){
     return true;
 }
 
-static bool trans_ASR_rrr(DisasContext *ctx, arg_ASR_rrr *a){
-    //Format 1
+static bool trans_ASR_f1(DisasContext *ctx, arg_ASR_f1 *a){
     TCGv shift = tcg_temp_new_i32();
     TCGv res = tcg_temp_new_i32();
     TCGv op = tcg_temp_new_i32();
@@ -560,14 +559,11 @@ static bool trans_ASR_f3(DisasContext *ctx, arg_ASR_f3 *a){
         tcg_gen_andi_i32(cpu_sflags[sflagC], cpu_sflags[sflagC], 0x1);
     }
 
-
-
     ctx->base.pc_next += 4;
     return true;
 }
 
 static bool trans_BFEXTS(DisasContext *ctx, arg_BFEXTS *a){
-
     TCGv rd = tcg_temp_new_i32();
     TCGv rs = tcg_temp_new_i32();
     TCGv temp = tcg_temp_new_i32();
@@ -595,7 +591,6 @@ static bool trans_BFEXTS(DisasContext *ctx, arg_BFEXTS *a){
     tcg_gen_shri_i32(temp, rd, 31);
     tcg_gen_mov_i32(cpu_sflags[sflagC], temp);
     tcg_gen_mov_i32(cpu_sflags[sflagN], temp);
-
 
     ctx->base.pc_next += 4;
     return true;
@@ -630,7 +625,6 @@ static bool trans_BFINS(DisasContext *ctx, arg_BFINS *a){
     TCGv temp = tcg_temp_new_i32();
     TCGv mask = tcg_temp_new_i32();
     TCGv revMask = tcg_temp_new_i32();
-    //TCGv rs = cpu_r[a->rs];
     int bp5 = a->bp5;
     int w5 = a->w5-1;
 
@@ -670,7 +664,28 @@ static bool trans_BLD(DisasContext *ctx, arg_BLD *a){
     return true;
 }
 
-static bool trans_BR_disp(DisasContext *ctx, arg_BR_disp *a){
+static bool trans_BR_f1(DisasContext *ctx, arg_BR_f1 *a){
+    int disp = (a->disp);
+
+    //check if bit 8 is set => sign extend disp
+    disp = sign_extend_8(disp);
+    disp = disp << 1;
+
+    TCGLabel *no_branch = gen_new_label();
+    TCGv reg = tcg_temp_new_i32();
+    int val = checkCondition(a->rd, reg, cpu_r, cpu_sflags);
+
+    tcg_gen_brcondi_i32(TCG_COND_NE, reg, val, no_branch);
+    gen_goto_tb(ctx, 0, ctx->base.pc_next+disp);
+
+    gen_set_label(no_branch);
+
+    ctx->base.pc_next += 2;
+    ctx->base.is_jmp = DISAS_CHAIN;
+    return true;
+}
+
+static bool trans_BR_f2(DisasContext *ctx, arg_BR_f2 *a){
     int disp = (a->disp2 << 17);
     disp |= (a->disp1 << 16);
     disp |= (a->disp0);
@@ -691,27 +706,6 @@ static bool trans_BR_disp(DisasContext *ctx, arg_BR_disp *a){
     gen_set_label(no_branch);
 
     ctx->base.pc_next += 4;
-    ctx->base.is_jmp = DISAS_CHAIN;
-    return true;
-}
-
-static bool trans_BR_rd(DisasContext *ctx, arg_BR_rd *a){
-    int disp = (a->disp);
-
-    //check if bit 8 is set => sign extend disp
-    disp = sign_extend_8(disp);
-    disp = disp << 1;
-
-    TCGLabel *no_branch = gen_new_label();
-    TCGv reg = tcg_temp_new_i32();
-    int val = checkCondition(a->rd, reg, cpu_r, cpu_sflags);
-
-    tcg_gen_brcondi_i32(TCG_COND_NE, reg, val, no_branch);
-    gen_goto_tb(ctx, 0, ctx->base.pc_next+disp);
-
-    gen_set_label(no_branch);
-
-    ctx->base.pc_next += 2;
     ctx->base.is_jmp = DISAS_CHAIN;
     return true;
 }
