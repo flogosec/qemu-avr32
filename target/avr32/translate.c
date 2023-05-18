@@ -976,58 +976,8 @@ static bool trans_CPW_f3(DisasContext *ctx, arg_CPW_f3 *a){
     return true;
 }
 
-static void cpc_instruction(TCGv res, TCGv rd, TCGv rs){
-
-    TCGv temp = tcg_temp_new_i32();
-    TCGv left = tcg_temp_new_i32();
-    TCGv right = tcg_temp_new_i32();
-
-    // Z-flag
-    tcg_gen_setcondi_i32(TCG_COND_EQ, temp, res, 0);
-    tcg_gen_and_i32(cpu_sflags[sflagZ], temp, cpu_sflags[sflagZ]);
-
-    tcg_gen_shri_i32(res, res, 31);
-    tcg_gen_shri_i32(rd, rd, 31);
-    tcg_gen_shri_i32(rs, rs, 31);
-
-    // N-flag
-    tcg_gen_mov_i32(cpu_sflags[sflagN], res);
-
-    // V-flag
-    tcg_gen_andc_i32(left, rd, rs);
-    tcg_gen_andc_i32(left, left, res);
-    tcg_gen_andc_i32(right, rs, rd);
-    tcg_gen_and_i32(right, right, res);
-    tcg_gen_or_i32(cpu_sflags[sflagV], left, right);
-
-    // C-flag
-    tcg_gen_andc_i32(left, rs, rd);
-    tcg_gen_and_i32(temp, rs, res);
-    tcg_gen_andc_i32(right, res, rd);
-
-    tcg_gen_or_i32(left, left, temp);
-    tcg_gen_or_i32(cpu_sflags[sflagC], left, right);
-
-}
-
-static bool trans_CPC_rd(DisasContext *ctx, arg_CPC_rd *a){
-
-    TCGv res = tcg_temp_new_i32();
-    TCGv rd = tcg_temp_new_i32();
-    TCGv rs = tcg_temp_new_i32();
-
-    tcg_gen_mov_i32(rd, cpu_r[a->rd]);
-    tcg_gen_movi_i32(rs, 0);
-    tcg_gen_sub_i32(res, rd, cpu_sflags[sflagC]);
-
-    cpc_instruction(res, rd, rs);
-
-    ctx->base.pc_next += 2;
-
-    return true;
-}
-
-static bool trans_CPC_rs_rd(DisasContext *ctx, arg_CPC_rs_rd *a){
+//TODO: add more tests
+static bool trans_CPC_f1(DisasContext *ctx, arg_CPC_f1 *a){
     TCGv res = tcg_temp_new_i32();
     TCGv rd = tcg_temp_new_i32();
     TCGv rs = tcg_temp_new_i32();
@@ -1037,10 +987,25 @@ static bool trans_CPC_rs_rd(DisasContext *ctx, arg_CPC_rs_rd *a){
     tcg_gen_sub_i32(res, cpu_r[a->rd], cpu_r[a->rs]);
     tcg_gen_sub_i32(res, res, cpu_sflags[sflagC]);
 
-    cpc_instruction(res, rd, rs);
-
+    set_flags_cpc(rd, rs, res, cpu_sflags);
 
     ctx->base.pc_next += 4;
+    return true;
+}
+
+//TODO: add more tests
+static bool trans_CPC_f2(DisasContext *ctx, arg_CPC_f2 *a){
+    TCGv res = tcg_temp_new_i32();
+    TCGv rd = tcg_temp_new_i32();
+    TCGv rs = tcg_temp_new_i32();
+
+    tcg_gen_mov_i32(rd, cpu_r[a->rd]);
+    tcg_gen_movi_i32(rs, 0);
+    tcg_gen_sub_i32(res, rd, cpu_sflags[sflagC]);
+
+    set_flags_cpc(rd, rs, res, cpu_sflags);
+
+    ctx->base.pc_next += 2;
     return true;
 }
 

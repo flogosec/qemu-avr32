@@ -40,6 +40,8 @@ void set_c_flag_add(TCGv op1, TCGv op2, TCGv result, TCGv cpu_sflags[]);
 void set_v_flag_cp(TCGv op1, TCGv op2, TCGv result, TCGv cpu_sflags[]);
 void set_c_flag_cp(TCGv op1, TCGv op2, TCGv result, TCGv cpu_sflags[]);
 
+void set_flags_cpc(TCGv op1, TCGv op2, TCGv result, TCGv cpu_sflags[]);
+
 void cpw_instruction(TCGv Rd, TCGv Rs, TCGv cpu_sflags[]);
 
 #endif //QEMU_AVR32_HELPER_CP_INST_H

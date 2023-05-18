@@ -164,11 +164,8 @@ INSN(CPW_f1,     CP.W,       "%s, %s",                       REG(a->rd), REG(a->
 INSN(CPW_f2,    CP.W,       "%s, 0x%04x",                  REG(a->rd), a->imm6)
 INSN(CPW_f3,    CP.W,       "%s",                         REG(a->rd))
 
-INSN(CPC_rd,     CPC,           "%s",                           REG(a->rd))
-INSN(CPC_rs_rd,     CPC,        "%s, %s",                       REG(a->rd), REG(a->rs))
-
-
-
+INSN(CPC_f1,     CPC,        "%s, %s",                          REG(a->rd), REG(a->rs))
+INSN(CPC_f2,     CPC,           "%s",                           REG(a->rd))
 
 INSN(CSRF_sr,    CSRF,     "0x%02x",                            (a->bp5))
 INSN(CSRFCZ_sr,  CSRFCZ,   "0x%02x",                            (a->bp5))

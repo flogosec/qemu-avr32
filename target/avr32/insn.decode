@@ -206,8 +206,8 @@ CPW_f1          000 .... 00011 ....                            @op_rs_rd
 CPW_f2          010 110 ...... ....                            @op_rd_imm6
 CPW_f3          111 .... 0010 . .... ................          @op_rd_imm21
 
-CPC_rd          010 1110 00010 ....                            @op_rd
-CPC_rs_rd       111 .... 00000 .... 0001 0011 00000000         @op_rs_rd_32
+CPC_f1          111 .... 00000 .... 0001 0011 00000000         @op_rs_rd_32
+CPC_f2          010 1110 00010 ....                            @op_rd
 
 # CSRF - Clear Status Register Flag: RS
 CSRF_sr         11010 10 ..... 0011                           @op_bp5
