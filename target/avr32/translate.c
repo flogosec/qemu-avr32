@@ -918,7 +918,20 @@ static bool trans_CPH(DisasContext *ctx, arg_CPH *a){
     return true;
 }
 
-static bool trans_CPW_rd_imm6(DisasContext *ctx, arg_CPW_rd_imm6 *a){
+static bool trans_CPW_f1(DisasContext *ctx, arg_CPW_f1 *a){
+    TCGv Rd = tcg_temp_new_i32();
+    TCGv Rs = tcg_temp_new_i32();
+
+    tcg_gen_mov_i32(Rd, cpu_r[a->rd]);
+    tcg_gen_mov_i32(Rs, cpu_r[a->rs]);
+
+    cpw_instruction(Rd, Rs, cpu_sflags);
+
+    ctx->base.pc_next += 2;
+    return true;
+}
+
+static bool trans_CPW_f2(DisasContext *ctx, arg_CPW_f2 *a){
     TCGv Rdt = cpu_r[a->rd];
 
     TCGv Rd = tcg_temp_new_i32();
@@ -937,7 +950,7 @@ static bool trans_CPW_rd_imm6(DisasContext *ctx, arg_CPW_rd_imm6 *a){
     return true;
 }
 
-static bool trans_CPW_rd_imm21(DisasContext *ctx, arg_CPW_rd_imm21 *a){
+static bool trans_CPW_f3(DisasContext *ctx, arg_CPW_f3 *a){
     int mmI = ( a->immu) <<17;
 
     mmI |= (a->immm) << 16;
@@ -960,19 +973,6 @@ static bool trans_CPW_rd_imm21(DisasContext *ctx, arg_CPW_rd_imm21 *a){
     cpw_instruction(Rd, Rs, cpu_sflags);
 
     ctx->base.pc_next += 4;
-    return true;
-}
-
-static bool trans_CPW_rs_rd(DisasContext *ctx, arg_CPW_rs_rd *a){
-    TCGv Rd = tcg_temp_new_i32();
-    TCGv Rs = tcg_temp_new_i32();
-
-    tcg_gen_mov_i32(Rd, cpu_r[a->rd]);
-    tcg_gen_mov_i32(Rs, cpu_r[a->rs]);
-
-    cpw_instruction(Rd, Rs, cpu_sflags);
-
-    ctx->base.pc_next += 2;
     return true;
 }
 
@@ -1021,7 +1021,6 @@ static bool trans_CPC_rd(DisasContext *ctx, arg_CPC_rd *a){
     tcg_gen_sub_i32(res, rd, cpu_sflags[sflagC]);
 
     cpc_instruction(res, rd, rs);
-
 
     ctx->base.pc_next += 2;
 
