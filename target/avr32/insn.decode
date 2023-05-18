@@ -152,15 +152,15 @@ ADD_cond        111 .... 11101 .... 1110 .... 0000 ....      @op_rx_ry_cond_rd
 ADDABS          111 .... 00000 .... 0000 11100100 ....       @op_rd_rx_ry
 ADDHHW          111 .... 00000 .... 0000 1110 00 . . ....    @op_rx_ry_x_y_rd
 
-AND_rr          000 .... 00110 ....                          @op_rs_rd
+AND_f1          000 .... 00110 ....                          @op_rs_rd
 AND_f2          111 .... 11110 .... 0000000 ..... ....      @op_rd_rx_ry_sa5
 AND_f3          111 .... 11110 .... 0000001 ..... ....       @op_rd_rx_ry_sa5
 #ANDLS_rrir     111 .... 11110 .... 0000000 ..... ....       @op_rx_ry_imm5_rd
 #ANDRS_rrir     111 .... 11110 .... 0000001 ..... ....       @op_rx_ry_imm5_rd
-AND_rrcr        111 .... 11101 .... 1110 .... 0010 ....       @op_rx_ry_cond_rd
-ANDH_coh_rd     111 00 1 . 00001 .... ................        @op_coh_rd_imm
-ANDL_coh_rd     111 00 0 . 00001 .... ................        @op_coh_rd_imm
-ANDN_rr         000 .... 01000 ....                           @op_rs_rd
+AND_cond        111 .... 11101 .... 1110 .... 0010 ....       @op_rx_ry_cond_rd
+ANDH            111 00 1 . 00001 .... ................        @op_coh_rd_imm
+ANDL            111 00 0 . 00001 .... ................        @op_coh_rd_imm
+ANDN            000 .... 01000 ....                           @op_rs_rd
 
 ASR_rrr         111 .... 00000 .... 0000 10000100 ....        @op_rd_rx_ry
 ASR_f2          101 .... 1010 . ....                          @op_rd_bp4_bp1

@@ -113,13 +113,13 @@ INSN(ADD_cond,         ADD_cond,  "%s, %s, [0x%04x], %s",   REG(a->rx), REG(a->r
 INSN(ADDABS,           ADDABS,      "%s, %s, %s",           REG(a->rd), REG(a->rx), REG(a->ry))
 INSN(ADDHHW,     ADDHHW,    "%s, %s, %s, %s, %s",     REG(a->rd), REG(a->rx), REG(a->x), REG(a->y), REG(a->rd))
 
-INSN(AND_rr,    AND,      "%s, %s",                         REG(a->rd), REG(a->rs))
+INSN(AND_f1,    AND,      "%s, %s",                         REG(a->rd), REG(a->rs))
 INSN(AND_f2,    AND,      "%s, %s, %s, 02%04x",             REG(a->rd), REG(a->rx), REG(a->ry), a->sa5)
 INSN(AND_f3,    AND,      "%s, %s, %s, 02%04x",             REG(a->rd), REG(a->rx), REG(a->ry), a->sa5)
-INSN(AND_rrcr,    AND,             "%s, %s, [0x%04x], %s",  REG(a->rx), REG(a->ry), a->cond, REG(a->rd))
-INSN(ANDH_coh_rd,    ANDH,      "%s, %d",                   REG(a->rd), a->coh)
-INSN(ANDL_coh_rd,    ANDL,      "%s, %d",                   REG(a->rd), a->coh)
-INSN(ANDN_rr,    ANDN,      "%s, %s",                       REG(a->rd), REG(a->rs))
+INSN(AND_cond,  AND,       "%s, %s, [0x%04x], %s",          REG(a->rx), REG(a->ry), a->cond, REG(a->rd))
+INSN(ANDH,      ANDH,      "%s, %d",                        REG(a->rd), a->coh)
+INSN(ANDL,      ANDL,      "%s, %d",                        REG(a->rd), a->coh)
+INSN(ANDN,      ANDN,      "%s, %s",                        REG(a->rd), REG(a->rs))
 
 INSN(ASR_rrr,    ASR,      "%s, %s, %s",                    REG(a->rd), REG(a->rx), REG(a->ry))
 INSN(ASR_f2,     ASR,      "%s, 0x%04x, 0x%02x",            REG(a->rd), a->bp4, a->bp1)

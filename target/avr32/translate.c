@@ -393,7 +393,7 @@ static bool trans_ADDHHW(DisasContext *ctx, arg_ADDHHW *a){
     return true;
 }
 
-static bool trans_AND_rr(DisasContext *ctx, arg_AND_rr *a){
+static bool trans_AND_f1(DisasContext *ctx, arg_AND_f1 *a){
 
     tcg_gen_and_i32(cpu_r[a->rd], cpu_r[a->rd], cpu_r[a->rs]);
     tcg_gen_setcondi_i32(TCG_COND_EQ, cpu_sflags[sflagZ], cpu_r[a->rd], 0);
@@ -425,7 +425,7 @@ static bool trans_AND_f3(DisasContext *ctx, arg_AND_f3 *a){
 }
 
 //TODO: add tests
-static bool trans_AND_rrcr(DisasContext *ctx, arg_AND_rrcr *a){
+static bool trans_AND_cond(DisasContext *ctx, arg_AND_cond *a){
     TCGv conVal = tcg_temp_new_i32();
     int val = checkCondition(a->cond, conVal, cpu_r, cpu_sflags);
     TCGLabel *noAction = gen_new_label();
@@ -438,7 +438,7 @@ static bool trans_AND_rrcr(DisasContext *ctx, arg_AND_rrcr *a){
     return true;
 }
 
-static bool trans_ANDH_coh_rd(DisasContext *ctx, arg_ANDH_coh_rd *a){
+static bool trans_ANDH(DisasContext *ctx, arg_ANDH *a){
     TCGv imm = tcg_temp_new_i32();
     TCGv rd = cpu_r[a->rd];
 
@@ -457,7 +457,7 @@ static bool trans_ANDH_coh_rd(DisasContext *ctx, arg_ANDH_coh_rd *a){
     return true;
 }
 
-static bool trans_ANDL_coh_rd(DisasContext *ctx, arg_ANDL_coh_rd *a){
+static bool trans_ANDL(DisasContext *ctx, arg_ANDL *a){
     TCGv imm = tcg_temp_new_i32();
     TCGv rd = cpu_r[a->rd];
 
@@ -478,7 +478,7 @@ static bool trans_ANDL_coh_rd(DisasContext *ctx, arg_ANDL_coh_rd *a){
 }
 
 //TODO: add tests
-static bool trans_ANDN_rr(DisasContext *ctx, arg_ANDN_rr *a){
+static bool trans_ANDN(DisasContext *ctx, arg_ANDN *a){
     tcg_gen_andc_i32(cpu_r[a->rd], cpu_r[a->rd], cpu_r[a->rs]);
     ctx->base.pc_next += 2;
     return true;
