@@ -752,7 +752,6 @@ static bool trans_CACHE(DisasContext *ctx, arg_CACHE *a){
 }
 
 static bool trans_CASTSB(DisasContext *ctx, arg_CASTSB *a){
-
     tcg_gen_ext8s_i32(cpu_r[a->rd], cpu_r[a->rd]);
 
     tcg_gen_shri_i32(cpu_sflags[sflagN], cpu_r[a->rd], 31);
@@ -803,7 +802,6 @@ static bool trans_CBR(DisasContext *ctx, arg_CBR *a){
 
     tcg_gen_setcondi_i32(TCG_COND_EQ, cpu_sflags[sflagZ], cpu_r[a->rd], 0);
 
-
     ctx->base.pc_next += 2;
     return true;
 }
@@ -827,7 +825,6 @@ static bool trans_CLZ(DisasContext *ctx, arg_CLZ *a){
     tcg_gen_brcondi_i32(TCG_COND_EQ, Rs, 1, ifT);
     tcg_gen_subi_i32(i, i, 1);
     tcg_gen_br(head);
-
 
     gen_set_label(ifT);
     tcg_gen_movi_i32(temp, 31);
@@ -856,7 +853,7 @@ static bool trans_COP(DisasContext *ctx, arg_COP *a){
     return true;
 }
 
-static bool trans_CPB_rs_rd(DisasContext *ctx, arg_CPB_rs_rd *a){
+static bool trans_CPB(DisasContext *ctx, arg_CPB *a){
     TCGv res = tcg_temp_new_i32();
     TCGv rd = tcg_temp_new_i32();
     TCGv rs = tcg_temp_new_i32();
@@ -888,7 +885,7 @@ static bool trans_CPB_rs_rd(DisasContext *ctx, arg_CPB_rs_rd *a){
     return true;
 }
 
-static bool trans_CPH_rs_rd(DisasContext *ctx, arg_CPH_rs_rd *a){
+static bool trans_CPH(DisasContext *ctx, arg_CPH *a){
     TCGv res = tcg_temp_new_i32();
     TCGv rd = tcg_temp_new_i32();
     TCGv rs = tcg_temp_new_i32();
@@ -897,7 +894,6 @@ static bool trans_CPH_rs_rd(DisasContext *ctx, arg_CPH_rs_rd *a){
     tcg_gen_andi_i32(rs, cpu_r[a->rs], 0x0000FFFF);
     tcg_gen_sub_i32(res, rd, rs);
     tcg_gen_andi_i32(res, res, 0x0000FFFF);
-
 
     //Z-flag
     tcg_gen_setcondi_i32(TCG_COND_EQ, cpu_sflags[sflagZ], res, 0);

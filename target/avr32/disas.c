@@ -158,8 +158,8 @@ INSN(COM,    COM,       "%s",                             REG(a->rd))
 //COP
 INSN(COP,     COP,       "CP: %d",                              a->cp)
 
-INSN(CPB_rs_rd,     CP.B,       "%s, %s",                       REG(a->rd), REG(a->rs))
-INSN(CPH_rs_rd,     CP.H,       "%s, %s",                       REG(a->rd), REG(a->rs))
+INSN(CPB,           CP.B,       "%s, %s",                       REG(a->rd), REG(a->rs))
+INSN(CPH,     CP.H,       "%s, %s",                       REG(a->rd), REG(a->rs))
 INSN(CPW_rd_imm6,    CP.W,       "%s, 0x%04x",                  REG(a->rd), a->imm6)
 INSN(CPW_rd_imm21,    CP.W,       "%s",                         REG(a->rd))
 INSN(CPW_rs_rd,     CP.W,       "%s, %s",                       REG(a->rd), REG(a->rs))
