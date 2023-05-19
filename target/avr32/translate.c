@@ -1052,7 +1052,7 @@ static bool trans_DIVU(DisasContext *ctx, arg_DIVU *a){
     return true;
 }
 
-static bool trans_EOR_rd_rs(DisasContext *ctx, arg_EOR_rd_rs *a){
+static bool trans_EOR_f1(DisasContext *ctx, arg_EOR_f1 *a){
     tcg_gen_xor_i32(cpu_r[a->rd], cpu_r[a->rd], cpu_r[a->rs]);
     tcg_gen_setcondi_i32(TCG_COND_EQ, cpu_sflags[sflagZ], cpu_r[a->rd], 0);
     tcg_gen_shri_i32(cpu_sflags[sflagN], cpu_r[a->rd], 31);
@@ -1086,7 +1086,7 @@ static bool trans_EOR_f3(DisasContext *ctx, arg_EOR_f3 *a){
 }
 
 //TODO: add tests
-static bool trans_EOR_rd_rx_ry_c(DisasContext *ctx, arg_EOR_rd_rx_ry_c *a){
+static bool trans_EOR_cond(DisasContext *ctx, arg_EOR_cond *a){
     TCGv reg = tcg_temp_new_i32();
     TCGLabel *exit = gen_new_label();
     int val = checkCondition(a->cond, reg, cpu_r, cpu_sflags);
@@ -1130,7 +1130,7 @@ static bool trans_FRS(DisasContext *ctx, arg_FRS *a){
     return false;
 }
 
-static bool trans_ICALL_rd(DisasContext *ctx, arg_ICALL_rd *a){
+static bool trans_ICALL(DisasContext *ctx, arg_ICALL *a){
     tcg_gen_addi_i32(cpu_r[LR_REG], cpu_r[PC_REG], 2);
     tcg_gen_mov_i32(cpu_r[PC_REG], cpu_r[a->rd]);
 
@@ -1263,7 +1263,7 @@ static bool trans_LDsb_f2(DisasContext *ctx, arg_LDsb_f2 *a){
 }
 
 //TODO: add tests
-static bool trans_LDsbc(DisasContext *ctx, arg_LDsbc *a){
+static bool trans_LDsb_cond(DisasContext *ctx, arg_LDsb_cond *a){
     TCGv reg = tcg_temp_new_i32();
     TCGLabel *exit = gen_new_label();
     int val = checkCondition(a->cond4, reg, cpu_r, cpu_sflags);
@@ -1337,7 +1337,7 @@ static bool trans_LDub_f5(DisasContext *ctx, arg_LDub_f5 *a){
     return true;
 }
 
-static bool trans_LDUBc(DisasContext *ctx, arg_LDUBc *a){
+static bool trans_LDUB_cond(DisasContext *ctx, arg_LDUB_cond *a){
 
 
     TCGLabel *exit = gen_new_label();
@@ -1411,7 +1411,7 @@ static bool trans_LDSH_f5(DisasContext *ctx, arg_LDSH_f5 *a){
     return true;
 }
 
-static bool trans_LDSHc(DisasContext *ctx, arg_LDSHc *a){
+static bool trans_LDSH_cond(DisasContext *ctx, arg_LDSH_cond *a){
 
     TCGLabel *no_load = gen_new_label();
 
@@ -1485,7 +1485,7 @@ static bool trans_LDUH_f5(DisasContext *ctx, arg_LDUH_f5 *a){
     return true;
 }
 
-static bool trans_LDUHc(DisasContext *ctx, arg_LDUHc *a){
+static bool trans_LDUH_cond(DisasContext *ctx, arg_LDUH_cond *a){
 
     TCGLabel *no_load = gen_new_label();
 
@@ -1625,7 +1625,7 @@ static bool trans_LDW_f6(DisasContext *ctx, arg_LDW_f6 *a){
     return true;
 }
 
-static bool trans_LDWc(DisasContext *ctx, arg_LDWc *a){
+static bool trans_LDW_cond(DisasContext *ctx, arg_LDW_cond *a){
 
     int disp = a->disp9 << 2;
     TCGLabel *no_ld = gen_new_label();
@@ -1648,7 +1648,7 @@ static bool trans_LDWc(DisasContext *ctx, arg_LDWc *a){
 
 // LDC, processor depending instruction
 
-static bool trans_LDDPC_rd(DisasContext *ctx, arg_LDDPC_rd *a)
+static bool trans_LDDPC(DisasContext *ctx, arg_LDDPC *a)
 {
     TCGv addr = tcg_temp_new_i32();
     TCGv Rd = cpu_r[a->rd];
@@ -1666,7 +1666,7 @@ static bool trans_LDDPC_rd(DisasContext *ctx, arg_LDDPC_rd *a)
     return true;
 }
 
-static bool trans_LDDSP_rd_disp(DisasContext *ctx, arg_LDDSP_rd_disp *a)
+static bool trans_LDDSP(DisasContext *ctx, arg_LDDSP *a)
 {
     TCGv addr = tcg_temp_new_i32();
     tcg_gen_andi_i32(addr, cpu_r[SP_REG], 0xFFFFFFFC);

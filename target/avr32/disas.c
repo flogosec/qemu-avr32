@@ -149,13 +149,10 @@ INSN(CASTUB,    CASTU.B,       "%s",                             REG(a->rd))
 
 INSN(CBR,    CBR,    "%s, 0x%02x, 0x%02x",                     REG(a->rd), a->bp4, a->bp1)
 
-// CLZ
 INSN(CLZ,    CLZ,       "%s, %s",                             REG(a->rd), REG(a->rs))
-
 
 INSN(COM,    COM,       "%s",                             REG(a->rd))
 
-//COP
 INSN(COP,     COP,       "CP: %d",                              a->cp)
 
 INSN(CPB,           CP.B,       "%s, %s",                       REG(a->rd), REG(a->rs))
@@ -173,16 +170,16 @@ INSN(CSRFCZ,            CSRFCZ,   "0x%02x",                            (a->bp5))
 INSN(DIVS,              DIVS,        "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
 INSN(DIVU,              DIVU,        "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
 
-INSN(EOR_rd_rs,         EOR,       "%s, %s",                    REG(a->rd), REG(a->rs))
+INSN(EOR_f1,         EOR,          "%s, %s",                    REG(a->rd), REG(a->rs))
 INSN(EOR_f2,         EOR,          "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
 INSN(EOR_f3,         EOR,          "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
-INSN(EOR_rd_rx_ry_c,    EOR,       "%s, %s, %s, %d",            REG(a->rd), REG(a->rx), REG(a->ry), a->cond)
+INSN(EOR_cond,    EOR,       "%s, %s, %s, %d",            REG(a->rd), REG(a->rx), REG(a->ry), a->cond)
 INSN(EORH,              EORH,       "%s, 0x%04x",                    REG(a->rd), a->imm16)
 INSN(EORL,              EORL,       "%s, 0x%04x",                    REG(a->rd), a->imm16)
 
 INSN(FRS,               FRS, "FRS"                             );
 
-INSN(ICALL_rd,    ICALL,       "%s",                             REG(a->rd))
+INSN(ICALL,    ICALL,       "%s",                             REG(a->rd))
 
 INSN(LDD_f1,   LDD,                  "%s, %s[0x%04x]",           REG(a->rp), REG(a->rd), a->rd)
 INSN(LDD_f2,   LDD,                  "%s, %s[0x%04x]",           REG(a->rp), REG(a->rd), a->rd)
@@ -193,14 +190,14 @@ INSN(LDD_f5,   LDD,                  "%s, %s, %s",               REG(a->rd), REG
 
 INSN(LDsb_f1,   LDSB,                "%s, %s[0x%04x]",           REG(a->rp), REG(a->rd), a->rd)
 INSN(LDsb_f2,   LDSB,                "%s, %s[%s<<%d]",       REG(a->rd), REG(a->rx), REG(a->ry), a->sa)
-INSN(LDsbc,             LDsbc,        "%s, %s, 0x%04x",           REG(a->rd), REG(a->rp), a->disp9)
+INSN(LDsb_cond,             LDsb_cond,        "%s, %s, 0x%04x",           REG(a->rd), REG(a->rp), a->disp9)
 
 INSN(LDub_f1,        LDUB,            "%s, %s",                  REG(a->rp), REG(a->rd))
 INSN(LDub_f2,        LDUB,            "%s, %s",                  REG(a->rp), REG(a->rd))
 INSN(LDub_f3,        LDUB,            "%s, %s, 0x%02x",                  REG(a->rp), REG(a->rd), a->disp3)
 INSN(LDUB_f4,        LDUB,        "%s, %s, 0x%04x",           REG(a->rp), REG(a->rd), a->disp16)
 INSN(LDub_f5,           LDUB,        "%s, %s, %s, %d",           REG(a->rd), REG(a->rx), REG(a->ry), a->sa)
-INSN(LDUBc,             LDUBc,        "%s, %s, 0x%04x",           REG(a->rd), REG(a->rp), a->disp9)
+INSN(LDUB_cond,         LDUBc,        "%s, %s, 0x%04x",           REG(a->rd), REG(a->rp), a->disp9)
 
 
 INSN(LDSH_f1,       LDSH,        "%s, %s",                        REG(a->rp), REG(a->rd))
@@ -208,13 +205,13 @@ INSN(LDSH_f2,       LDSH,        "%s, %s",                        REG(a->rp), RE
 INSN(LDSH_f3,       LDSH,        "%s, %s, 0x%02x",               REG(a->rp), REG(a->rd), a->disp3);
 INSN(LDSH_f4,       LDSH,        "%s, %s, 0x%02x",               REG(a->rp), REG(a->rd), a->disp16);
 INSN(LDSH_f5,       LDSH,        "%s, %s, %s, 0x%02x",               REG(a->rd), REG(a->rx), REG(a->ry), a->sa);
-INSN(LDSHc,     LDSHc,           "%s, %s",                            REG(a->rp), REG(a->rd))
+INSN(LDSH_cond,     LDSHc,           "%s, %s",                       REG(a->rp), REG(a->rd))
 INSN(LDUH_f1,   LDUH,        "%s, %s",                              REG(a->rp), REG(a->rd))
 INSN(LDUH_f2,   LDUH,        "%s, %s",                              REG(a->rp), REG(a->rd))
 INSN(LDUH_f3,   LDUH,        "%s, %s, 0x%02x",                        REG(a->rp), REG(a->rd), a->disp3)
 INSN(LDUH_f4,   LDUH,        "%s, %s, 0x%02x",                        REG(a->rp), REG(a->rd), a->disp16)
-INSN(LDUH_f5,           LDUH,        "%s, %s, %s, %d",           REG(a->rd), REG(a->rx), REG(a->ry), a->sa)
-INSN(LDUHc,     LDUHc,      "%s, %s",                            REG(a->rp), REG(a->rd))
+INSN(LDUH_f5,       LDUH,        "%s, %s, %s, %d",                    REG(a->rd), REG(a->rx), REG(a->ry), a->sa)
+INSN(LDUH_cond,     LDUHc,      "%s, %s",                             REG(a->rp), REG(a->rd))
 
 INSN(LDW_f1,            LDW,          "%s, %s",                        REG(a->rp), REG(a->rd))
 INSN(LDW_f2,            LDW,          "%s, %s",                        REG(a->rp), REG(a->rd))
@@ -222,10 +219,10 @@ INSN(LDW_f3,            LDW,    "%s, %s, 0x%04x",                REG(a->rp), REG
 INSN(LDW_f4,            LDW,        "%s, %s, 0x%04x",           REG(a->rp), REG(a->rd), a->disp16)
 INSN(LDW_f5,            LDW,        "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
 INSN(LDW_f6,            LDW,        "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
-INSN(LDWc,              LDWc,       "%s, %s, 0x%04x, 0x%04x",    REG(a->rp), REG(a->rd), a->cond4, a->disp9)
+INSN(LDW_cond,          LDWc,       "%s, %s, 0x%04x, 0x%04x",    REG(a->rp), REG(a->rd), a->cond4, a->disp9)
 
-INSN(LDDPC_rd,   LDDPC,    "%s, PC[0x%04x]",                    REG(a->rd), a->disp << 2)
-INSN(LDDSP_rd_disp,   LDDSP,    "%s, %d",                       REG(a->rd), a->disp << 2)
+INSN(LDDPC,      LDDPC,    "%s, PC[0x%04x]",                    REG(a->rd), a->disp << 2)
+INSN(LDDSP,      LDDSP,    "%s, %d",                       REG(a->rd), a->disp << 2)
 
 INSN(LDINSB,            LDINSB,     "%s, %s, 0x%02x, 0x%04x",   REG(a->rd), REG(a->rp), a->part, a->disp12)
 INSN(LDINSH,            LDINSB,     "%s, %s, 0x%02x, 0x%04x",   REG(a->rd), REG(a->rp), a->part, a->disp12)
