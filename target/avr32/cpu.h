@@ -133,6 +133,10 @@ int avr32_cpu_memory_rw_debug(CPUState *cs, vaddr addr, uint8_t *buf, int len, b
 
 void avr32_cpu_synchronize_from_tb(CPUState *cs, const TranslationBlock *tb);
 
+int avr32_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
+int avr32_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+vaddr avr32_cpu_gdb_adjust_breakpoint(CPUState *cpu, vaddr addr);
+
 #include "exec/cpu-all.h"
 
 #endif /* !defined (QEMU_AVR32A_CPU_H) */

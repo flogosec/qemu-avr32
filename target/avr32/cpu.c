@@ -208,6 +208,11 @@ static void avr32a_cpu_class_init(ObjectClass *oc, void *data)
     cc->sysemu_ops = &avr32_sysemu_ops;
     cc->disas_set_info = avr32_cpu_disas_set_info;
     cc->tcg_ops = &avr32_tcg_ops;
+    cc->gdb_read_register = avr32_cpu_gdb_read_register;
+    cc->gdb_write_register = avr32_cpu_gdb_write_register;
+    cc->gdb_adjust_breakpoint = avr32_cpu_gdb_adjust_breakpoint;
+    cc->gdb_num_core_regs = 16;
+    cc->gdb_core_xml_file = "avr32a-cpu.xml";
 }
 
 
