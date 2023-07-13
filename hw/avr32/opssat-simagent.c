@@ -64,6 +64,7 @@ int s_socket;
 char incoming_message[1000];
 struct sockaddr_in client_addr, server_addr;
 socklen_t client_size;
+OpsSatSimAgentState* sim_agent_state;
 
 typedef struct __attribute__((__packed__)) {
     csp_id_t id;
@@ -111,14 +112,42 @@ static int readMessage(void){
         client_sock = -1;
         return 0;
     }
+    printf("[opssat_sim_thread] Received %d bytes of data\n", recv_result);
     return recv_result;
 }
 
+static void print_received_data(net_csp_packet_t* packet){
+    printf("[opssat_sim_thread] Emitting Packet=\n\t");
+    int counter = 0;
+    for (int i = 0; i < sizeof(net_csp_packet_t); ++i) {
+        printf("%02x ", ((uint8_t*) packet)[i]);
+        counter++;
+        if(counter == 16){
+            counter = 0;
+            printf("\n\t");
+        }
+    }
+    printf("\n");
+}
+
+static void handle_received_message(void){
+    net_csp_packet_t* packet = (net_csp_packet_t*) g_malloc0(sizeof(net_csp_packet_t));
+    packet->id.ext = ((uint8_t)incoming_message[0] << 24) | ((uint8_t)incoming_message[1] << 16) | (((uint8_t)incoming_message[2]) << 8) | (uint8_t)incoming_message[3];
+    printf("[opssat_sim_thread] id.ext=0x%x\n", packet->id.ext);
+
+    memcpy(packet->data, &incoming_message[4], sizeof(packet->data));
+    packet->id.ext = htonl(packet->id.ext);
+
+    print_received_data(packet);
+
+    nanocom_ax100_send_packet(sim_agent_state->nanocom, (char*) packet, sizeof(net_csp_packet_t));
+    qemu_mutex_unlock_iothread();
+}
 
 static void* opssat_sim_thread(void *opaque)
 {
     s_socket = init_sim_server();
-    OpsSatSimAgentState* s = opaque;
+    sim_agent_state = opaque;
 
     while(1) {
         memset(incoming_message, '\0', sizeof(incoming_message));
@@ -137,32 +166,9 @@ static void* opssat_sim_thread(void *opaque)
         if(recv_result <= 0){
             continue;
         }
-
-        printf("[opssat_sim_thread] Received %d bytes of data\n", recv_result);
         qemu_mutex_lock_iothread();
 
-        net_csp_packet_t* packet = (net_csp_packet_t*) g_malloc0(sizeof(net_csp_packet_t));
-        packet->id.ext = ((uint8_t)incoming_message[0] << 24) | ((uint8_t)incoming_message[1] << 16) | (((uint8_t)incoming_message[2]) << 8) | (uint8_t)incoming_message[3];
-        printf("[opssat_sim_thread] id.ext=0x%x\n", packet->id.ext);
-
-        memcpy(packet->data, &incoming_message[4], sizeof(packet->data));
-        packet->id.ext = htonl(packet->id.ext);
-
-        printf("[opssat_sim_thread] Emitting Packet=\n\t");
-        int counter = 0;
-        for (int i = 0; i < sizeof(net_csp_packet_t); ++i) {
-            printf("%02x ", ((uint8_t*) packet)[i]);
-            counter++;
-            if(counter == 16){
-                counter = 0;
-                printf("\n\t");
-            }
-        }
-        printf("\n");
-
-        nanocom_ax100_send_packet(s->nanocom, (char*) packet, sizeof(net_csp_packet_t));
-
-        qemu_mutex_unlock_iothread();
+        handle_received_message();
     }
 
     return NULL;
