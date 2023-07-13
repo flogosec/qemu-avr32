@@ -28,6 +28,8 @@
 #include "hw/loader.h"
 #include "hw/qdev-properties.h"
 #include "at32uc3_twim.h"
+#include "opssat-simagent.h"
+
 struct NanomindA3200MachineState {
     /*< private >*/
     MachineState parent_obj;
@@ -37,6 +39,8 @@ struct NanomindA3200MachineState {
     MemoryRegion ebi_sdram;
     DeviceState* spi_flash[2];
     DeviceState* fram[2];
+
+    OpsSatSimAgentState sim;
 };
 typedef struct NanomindA3200MachineState NanomindA3200MachineState;
 
@@ -74,6 +78,9 @@ static void nanomind_3200_init(MachineState *machine)
 
     object_initialize_child(OBJECT(machine), "soc", &nmms->soc, TYPE_AT32UC3C0512C_SOC);
     sysbus_realize(SYS_BUS_DEVICE(&nmms->soc), &error_abort);
+
+    object_initialize_child(OBJECT(machine), "sim", &nmms->sim, TYPE_OPSSAT_SIMAGENT);
+    qdev_realize(DEVICE(&nmms->sim), NULL, &error_abort);
 
     const int spi_num_buses = 2;
     for(int i = 0; i < spi_num_buses; ++i) {
@@ -140,6 +147,33 @@ static void nanomind_3200_init(MachineState *machine)
 
     //BUS I2C with CSP implementation
     dev = DEVICE(i2c_slave_create_simple(nmms->soc.twim[0].bus, "nanopower.p31u", 0x2));
+    (void) dev;
+    NanoComAX100State* nanocom = NANOCOM_AX100(i2c_slave_create_simple(nmms->soc.twim[0].bus, "nanocom.ax100", 0x6));
+    nmms->sim.nanocom = nanocom;
+    nanocom->simagent = &nmms->sim;
+    nanocom->bus = nmms->soc.twim[0].bus;
+
+    // TODO: Reverse the rparam format
+    // TODO: Implement basic GPIO controller
+    // TODO: Check when telemetry is sent, is it actually sent?
+    // TODO: The code currently seems to actually finish, is there a loop missing?
+    // TODO: Improve logging output for FRAM
+
+    // The following ones are NOT NanoComs, just needed a quick mock
+    // CCSDS Engine @ 0x7 OR is this the S-Band TRX?
+    dev = DEVICE(i2c_slave_create_simple(nmms->soc.twim[0].bus, "opssat-payl-mock", 0x7));
+    (void) dev;
+    // Somehow rtables used in some EPS setup?
+    dev = DEVICE(i2c_slave_create_simple(nmms->soc.twim[0].bus, "opssat-payl-mock", 0x3));
+    (void) dev;
+    dev = DEVICE(i2c_slave_create_simple(nmms->soc.twim[0].bus, "opssat-payl-mock", 0x4));
+    (void) dev;
+
+    // S-Band (R?)TX @ 0x51
+    dev = DEVICE(i2c_slave_create_simple(nmms->soc.twim[2].bus, "opssat-payl-mock", 0x51));
+    (void) dev;
+    // X-Band TX @ 0x52, Does not seem toimplement the CSP stuff
+    dev = DEVICE(i2c_slave_create_simple(nmms->soc.twim[2].bus, "opssat-payl-mock", 0x52));
     (void) dev;
 
     printf("Board setup complete\n");

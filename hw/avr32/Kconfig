@@ -60,6 +60,13 @@ config FM33256B
     bool
     select SSI
 
+config NANOCOM_AX100
+    bool
+    select I2C
+
+config OPSSAT_SIM_AGENT
+    bool
+
 config NANOPOWER_P31U
     bool
     select I2C
@@ -79,3 +86,5 @@ config NANOMIND_A3200
     select GSSB_ISTAGE
     select FM33256B
     select NANOPOWER_P31U
+    select NANOCOM_AX100
+    select OPSSAT_SIM_AGENT

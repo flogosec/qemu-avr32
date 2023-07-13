@@ -20,4 +20,8 @@ avr32_ss.add(files('fm33256b.c'))
 avr32_ss.add(files('nanomind_a3200.c'))
 avr32_ss.add(files('nanopower-p31u.c'))
 
+avr32_ss.add(files('opssat-payl-mock.c'))
+avr32_ss.add(when: 'CONFIG_NANOCOM_AX100', if_true: files('nanocom_ax100.c'))
+avr32_ss.add(when: 'CONFIG_OPSSAT_SIM_AGENT', if_true: files('opssat-simagent.c'))
+
 hw_arch += {'avr32': avr32_ss}
