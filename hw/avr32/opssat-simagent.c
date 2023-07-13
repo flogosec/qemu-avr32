@@ -59,23 +59,24 @@ typedef union {
 } csp_id_t;
 
 int client_sock = -1;
+int server_port = 10001;
+int s_socket;
+char incoming_message[1000];
+struct sockaddr_in client_addr, server_addr;
+socklen_t client_size;
 
 typedef struct __attribute__((__packed__)) {
     csp_id_t id;
     uint8_t data[140];
 } net_csp_packet_t;
 
-
-static void* opssat_sim_thread(void *opaque)
-{
-    OpsSatSimAgentState* s = opaque;
+static int init_sim_server(void){
     int s_socket = socket(AF_INET, SOCK_STREAM, 0);
-    struct sockaddr_in server_addr, client_addr;
-    socklen_t client_size = sizeof(client_addr);
-    char incoming_message[1000];
+
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(10001);
+    server_addr.sin_port = htons(server_port);
     server_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
+    client_size = sizeof(client_addr);
 
     if(bind(s_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0){
         printf("[opssat_sim_thread] Failed to create socket, aborting!\n");
@@ -83,6 +84,14 @@ static void* opssat_sim_thread(void *opaque)
     } else {
         printf("[opssat_sim_thread] Server bound to port 10001 @ 0.0.0.0\n");
     }
+    return s_socket;
+}
+
+static void* opssat_sim_thread(void *opaque)
+{
+    s_socket = init_sim_server();
+    OpsSatSimAgentState* s = opaque;
+
 
     while(1) {
         memset(incoming_message, '\0', sizeof(incoming_message));
