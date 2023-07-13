@@ -2,7 +2,10 @@
 QEMU AVR32 README
 ===========
 I added support for the AVR32 instruction set to QEMU.
-This branch contains an implementation for the Nanomind A3200 board.
+This branch contains an implementation for the Nanomind A3200 board that was extended to emulate the firmware of ESA's OPS-SAT.
+The code contains multiple segments that are specific for the OPS-SAT (for example workarounds to fix missing hardware emulations).
+Do not use this branch if you plan to do anything other than emulation the OPS-SAT firmware.
+For regular AVR32 emulation use the master branch or the Nanomind A3200 branch.
 
 
 Building
