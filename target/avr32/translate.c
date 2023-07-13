@@ -935,6 +935,11 @@ static bool trans_CPH_rs_rd(DisasContext *ctx, arg_CPH_rs_rd *a){
 }
 
 static bool trans_CPW_rd_imm6(DisasContext *ctx, arg_CPW_rd_imm6 *a){
+    //TODO: OPS-SAT firmware specific workaround to prevent endless loop
+    if(ctx->base.pc_next == 0xd00778b8){
+        tcg_gen_movi_i32(cpu_r[a->rd], 0x1);
+    }
+
     TCGv Rdt = cpu_r[a->rd];
 
     TCGv Rd = tcg_temp_new_i32();
@@ -2358,6 +2363,11 @@ static bool trans_MFSR_rd_sr(DisasContext *ctx, arg_MFSR_rd_sr *a)
     }
     tcg_gen_mov_i32(cpu_r[a->rd], sr);
 
+    //TODO: OPS-SAT firmware specific workaround for can_init to prevent endless loop
+    if(ctx->base.pc_next == 0xd00c2d84){
+        tcg_gen_movi_i32(cpu_r[a->rd], 0xcfeea3f);
+    }
+
     ctx->base.pc_next += 4;
     return true;
 }
@@ -2755,6 +2765,13 @@ static bool trans_POPM(DisasContext *ctx, arg_POPM *a){
         tcg_gen_mov_i32(res, cpu_r[12]);
         tcg_gen_setcondi_i32(TCG_COND_EQ, cpu_sflags[sflagZ], res, 0);
         tcg_gen_shri_i32(cpu_sflags[sflagN], res, 31);
+    }
+
+    //TODO: OPS-SAT specific workaround for rand() to handle missing impurte_ptr data.
+    //TODO: Add impure_ptr device later.
+    if(ctx->base.pc_next == 0xd00cfe66){
+        int rn = rand();
+        tcg_gen_movi_i32(cpu_r[12], rn);
     }
 
     ctx->base.pc_next += 2;
@@ -4069,11 +4086,31 @@ static void avr32_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
 
 static void avr32_tr_tb_start(DisasContextBase *db, CPUState *cs)
 {
+
 }
 
 static void avr32_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
 {
     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+
+    //TODO: Implement proper hardware emulation to prevent endless loops in OPS-SAT firmware startup
+    if(
+            (ctx->base.pc_next == 0xd00c106a)|| //ops-firmware sdramc_init
+            (ctx->base.pc_next == 0xd00c1022)|| //ops-firmware sdramc_init
+            (ctx->base.pc_next == 0xd00c0fb2)|| //ops-firmware sdramc_init
+            (ctx->base.pc_next == 0xd00c0fde)|| //ops-firmware sdramc_init
+            (ctx->base.pc_next == 0xd00c2558)) //ops-firmware wd-clear
+    {
+        ctx->base.pc_next += 2;
+    }
+    else if(ctx->base.pc_next == 0xd00850e4|| // xQueueGenericReceiv in  COMEvent_PublishEvent
+            ctx->base.pc_next == 0xd009065c|| // REQUEST_CheckMissingDataSets
+            ctx->base.pc_next == 0xd00a33c6) // send_command in log_command. Workaround to prevent uart pointer cpu_reset.
+
+    {
+        ctx->base.pc_next += 4;
+    }
+
     tcg_gen_insn_start(ctx->base.pc_next);
 }
 
