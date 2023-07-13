@@ -1,8 +1,26 @@
+/*
+ * AT32UC3 Timer
+ *
+ * Copyright (c) 2023 Florian Göhler, Johannes Willbold
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, see
+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
+ */
 #include "qemu/osdep.h"
 #include "qemu/module.h"
 #include "hw/timer/at32uc3_timer.h"
 #include "migration/vmstate.h"
-#include "qemu/timer.h"
 #include "sys/time.h"
 #include "qom/object.h"
 #include "qemu/main-loop.h"
