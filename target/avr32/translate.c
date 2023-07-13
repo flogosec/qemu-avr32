@@ -3349,7 +3349,8 @@ static bool trans_SCR(DisasContext *ctx, arg_SCR *a){
 //TODO: implement
 static bool trans_SLEEP(DisasContext *ctx, arg_SLEEP *a)
 {
-    return false;
+    ctx->base.pc_next += 4;
+    return true;
 }
 
 static bool trans_SR(DisasContext *ctx, arg_SR *a){
