@@ -87,11 +87,38 @@ static int init_sim_server(void){
     return s_socket;
 }
 
+static int handle_new_client(void){
+    if (client_sock < 0) {
+        printf("[opssat_sim_thread] Waiting for connection...\n");
+        client_sock = accept(s_socket, (struct sockaddr*)&client_addr, &client_size);
+        if (client_sock < 0) {
+            printf("[opssat_sim_thread] Client acceptance error\n");
+            return 0;
+        }
+        printf("=================================================================\n");
+        printf("\n");
+        printf("\n");
+        printf("\n");
+        printf("[opssat_sim_thread] New client connected from %s\n", inet_ntoa(client_addr.sin_addr));
+    }
+    return 1;
+}
+
+static int readMessage(void){
+    int recv_result = recv(client_sock, incoming_message, sizeof(incoming_message), 0);
+    if(recv_result <= 0){
+        printf("[opssat_sim_thread] Connection closed. Restarting\n");
+        client_sock = -1;
+        return 0;
+    }
+    return recv_result;
+}
+
+
 static void* opssat_sim_thread(void *opaque)
 {
     s_socket = init_sim_server();
     OpsSatSimAgentState* s = opaque;
-
 
     while(1) {
         memset(incoming_message, '\0', sizeof(incoming_message));
@@ -102,24 +129,12 @@ static void* opssat_sim_thread(void *opaque)
             continue;
         }
 
-        if (client_sock < 0) {
-            printf("[opssat_sim_thread] Waiting for connection...\n");
-            client_sock = accept(s_socket, (struct sockaddr*)&client_addr, &client_size);
-            if (client_sock < 0) {
-                printf("[opssat_sim_thread] Client acceptance error\n");
-                continue;
-            }
-            printf("=================================================================\n");
-            printf("\n");
-            printf("\n");
-            printf("\n");
-            printf("[opssat_sim_thread] New client connected from %s\n", inet_ntoa(client_addr.sin_addr));
+        if(!handle_new_client()){
+            continue;
         }
 
-        int recv_result = recv(client_sock, incoming_message, sizeof(incoming_message), 0);
+        int recv_result = readMessage();
         if(recv_result <= 0){
-            printf("[opssat_sim_thread] Connection closed. Restarting\n");
-            client_sock = -1;
             continue;
         }
 
