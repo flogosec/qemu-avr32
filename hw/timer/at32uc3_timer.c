@@ -119,9 +119,10 @@ static uint64_t at32uc_timer_read(void *opaque, hwaddr addr, unsigned int size)
                     if(channel_get_wavsel(ch) == 2) {
                         max_count = ch->rc;
                     }
-
                     // The ptimer counts down, but the doc specifies that our timer ticks up
-                    return max_count - ptimer_get_count(ch->timer);
+                    uint32_t ret_val = max_count - ptimer_get_count(ch->timer);
+
+                    return ret_val;
                 } else {
                     return 0;
                 }
@@ -346,7 +347,7 @@ static void at32uc3_timer_realize(DeviceState *dev, Error **errp)
     // Frequency: PBC clock / 32 (TIMER0_CLOCK4) (Section 31.8.1)
     // PBC Clock: f_PBx = f_main / 2 ^ (PBSEL + 1) (section 7.6.1.2)
     // f_main = ?
-        // Between 0.4 and 20 MHz (Section 8.5.1)
+    // Between 0.4 and 20 MHz (Section 8.5.1)
     // PBSEL =>  Clock Select (PBxSEL) comes from a Power Manager (PM) register (Section 7.7.4)
 
     for(int i = 0; i < 3; ++i) {
