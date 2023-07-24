@@ -139,10 +139,6 @@ void set_c_flag_add(TCGv op1, TCGv op2, TCGv result, TCGv cpu_sflags[]){
     tcg_gen_or_i32(left, left, temp);
     tcg_gen_andc_i32(right, op2, result);
     tcg_gen_or_i32(cpu_sflags[sflagC], left, right);
-
-    //tcg_temp_new_i32(temp);
-    //tcg_temp_new_i32(right);
-    //tcg_temp_new_i32(left);
 }
 
 void set_v_flag_cp(TCGv op1, TCGv op2, TCGv result, TCGv cpu_sflags[]){
@@ -154,10 +150,6 @@ void set_v_flag_cp(TCGv op1, TCGv op2, TCGv result, TCGv cpu_sflags[]){
     tcg_gen_andc_i32(right, op2, op1);
     tcg_gen_and_i32(right, right, result);
     tcg_gen_or_i32(cpu_sflags[sflagV], left, right);
-
-    //tcg_temp_new_i32(temp);
-    //tcg_temp_new_i32(right);
-    //tcg_temp_new_i32(left);
 }
 
 void set_c_flag_cp(TCGv op1, TCGv op2, TCGv result, TCGv cpu_sflags[]){
@@ -169,10 +161,25 @@ void set_c_flag_cp(TCGv op1, TCGv op2, TCGv result, TCGv cpu_sflags[]){
     tcg_gen_or_i32(left, left, right);
     tcg_gen_andc_i32(right, result, op1);
     tcg_gen_or_i32(cpu_sflags[sflagC], left, right);
+}
 
-    //tcg_temp_new_i32(temp);
-    //tcg_temp_new_i32(right);
-    //tcg_temp_new_i32(left);
+void set_flags_cpc(TCGv rd, TCGv rs, TCGv res, TCGv cpu_sflags[]){
+    TCGv temp = tcg_temp_new_i32();
+    // Z-flag
+    tcg_gen_setcondi_i32(TCG_COND_EQ, temp, res, 0);
+    tcg_gen_and_i32(cpu_sflags[sflagZ], temp, cpu_sflags[sflagZ]);
+
+    //Prepare bit[31]
+    tcg_gen_shri_i32(res, res, 31);
+    tcg_gen_shri_i32(rd, rd, 31);
+    tcg_gen_shri_i32(rs, rs, 31);
+
+    // N-flag
+    tcg_gen_mov_i32(cpu_sflags[sflagN], res);
+
+    //c and v flag
+    set_c_flag_cp(rd, rs, res, cpu_sflags);
+    set_v_flag_cp(rd, rs, res, cpu_sflags);
 }
 
 void cpw_instruction(TCGv Rd, TCGv Rs, TCGv cpu_sflags[]){

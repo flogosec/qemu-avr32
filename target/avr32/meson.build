@@ -12,6 +12,7 @@ avr32_ss.add(files(
   'disas.c',
   'helper.c',
   'helper_conditions.c',
+  'gdbstub.c',
   'translate.c'
   ))
 

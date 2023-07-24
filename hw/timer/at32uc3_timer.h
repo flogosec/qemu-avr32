@@ -31,6 +31,4 @@ struct AT32UC3TIMERState {
     AT32UC3TimerChannel channels[3];
 };
 
-void startTimer(void);
-
 #endif //QEMU_AVR32_AT32UC3_TIMER_H

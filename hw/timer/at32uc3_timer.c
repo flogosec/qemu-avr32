@@ -322,33 +322,6 @@ static const MemoryRegionOps timer_ops = {
         }
 };
 
-void startTimer(void){
-//    timerRunning = true;
-//    pthread_cond_signal(&timerWait);
-}
-
-//static void *timer_thread(void *opaque)
-//{
-//    AT32UC3TIMERState *tcs = opaque;
-//
-//    while (1) {
-//        if(!timerRunning){
-//            pthread_cond_wait(&timerWait, &timerLock);
-//            usleep(200);
-//        }
-//
-//        qemu_mutex_lock_iothread();
-//        if(!timerRunning){
-//            qemu_mutex_unlock_iothread();
-//            continue;
-//        }
-//        qemu_set_irq(tcs->irq, 1);
-//        qemu_mutex_unlock_iothread();
-//        usleep(50);
-//    }
-//    return NULL;
-//}
-
 static void avr32_ch2_timer_tick(void* opaque)
 {
     AT32UC3TIMERState* s = opaque;
@@ -368,10 +341,6 @@ static void at32uc3_timer_realize(DeviceState *dev, Error **errp)
 
     memory_region_init_io(&s->mmio, OBJECT(s), &timer_ops, s, TYPE_AT32UC3_TIMER, 0x200); // R_MAX * 4 = size of region
     sysbus_init_mmio(sbd, &s->mmio);
-
-//    qemu_mutex_init(&s->thr_mutex);
-//    qemu_cond_init(&s->thr_cond);
-//    qemu_thread_create(&s->thread, "tc0_timer", timer_thread, s, QEMU_THREAD_JOINABLE);
 
     // TIMER_CLOCK 4 frequency for TC0:
     // Frequency: PBC clock / 32 (TIMER0_CLOCK4) (Section 31.8.1)
