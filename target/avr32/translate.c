@@ -920,6 +920,7 @@ static bool trans_CPH(DisasContext *ctx, arg_CPH *a){
 
 static bool trans_CPW_f1(DisasContext *ctx, arg_CPW_f1 *a){
     //TODO: OPS-SAT firmware specific workaround to prevent endless loop
+    //TODO: implement mock GPIO Antenna power device
     if(ctx->base.pc_next == 0xd00778b8){
         tcg_gen_movi_i32(cpu_r[a->rd], 0x1);
     }
@@ -2291,11 +2292,6 @@ static bool trans_MFSR(DisasContext *ctx, arg_MFSR *a){
         tcg_gen_mov_i32(sr, cpu_sysr[a->sr]);
     }
     tcg_gen_mov_i32(cpu_r[a->rd], sr);
-
-    //TODO: OPS-SAT firmware specific workaround for can_init to prevent endless loop
-    if(ctx->base.pc_next == 0xd00c2d84){
-        tcg_gen_movi_i32(cpu_r[a->rd], 0xcfeea3f);
-    }
 
     ctx->base.pc_next += 4;
     return true;
