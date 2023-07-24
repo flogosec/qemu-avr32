@@ -2266,7 +2266,7 @@ static bool trans_MEMT_bp5_imm15(DisasContext *ctx, arg_MEMT_bp5_imm15 *a)
     return false;
 }
 
-static bool trans_MFSR_rd_sr(DisasContext *ctx, arg_MFSR_rd_sr *a){
+static bool trans_MFSR(DisasContext *ctx, arg_MFSR *a){
     TCGv sr = tcg_temp_new_i32();
     if((a->sr)== 0){
         tcg_gen_movi_i32(sr, 0);

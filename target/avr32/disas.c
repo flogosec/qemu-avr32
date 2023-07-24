@@ -258,7 +258,7 @@ INSN(MEMC_bp5_imm15,     MEMC,        "bp: 0x%02x, imm: [0x%04x]",     a->bp5, a
 INSN(MEMS_bp5_imm15,     MEMS,        "bp: 0x%02x, imm: [0x%04x]",     a->bp5, a->imm15)
 INSN(MEMT_bp5_imm15,     MEMT,        "bp: 0x%02x, imm: [0x%04x]",     a->bp5, a->imm15)
 
-INSN(MFSR_rd_sr,        MFSR,        "%s, SysReg: [0x%04x]",    REG(a->rd), (a->sr))
+INSN(MFSR,        MFSR,                "%s, SysReg: [0x%04x]",    REG(a->rd), (a->sr))
 
 INSN(MIN_rd_rx_ry,      MIN,       "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
 

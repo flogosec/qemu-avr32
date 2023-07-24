@@ -299,7 +299,7 @@ MEMC_bp5_imm15  111 101100001 ..... ...............         @op_bp5_imm15
 MEMS_bp5_imm15  111 110000001 ..... ...............         @op_bp5_imm15
 MEMT_bp5_imm15  111 110100001 ..... ...............         @op_bp5_imm15
 
-MFSR_rd_sr      111 000011011 .... 00000000 ........        @op_rd_sr
+MFSR            111 000011011 .... 00000000 ........        @op_rd_sr
 
 # TODO: verify, instruction set reference contains error in opcode
 MIN_rd_rx_ry    111 .... 00000 .... 0000 11010100 ....      @op_rd_rx_ry
