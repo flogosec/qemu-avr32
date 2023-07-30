@@ -4008,13 +4008,6 @@ static void avr32_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
     {
         ctx->base.pc_next += 2;
     }
-    else if(ctx->base.pc_next == 0xd00850e4|| // xQueueGenericReceiv in  COMEvent_PublishEvent
-            ctx->base.pc_next == 0xd009065c|| // REQUEST_CheckMissingDataSets
-            ctx->base.pc_next == 0xd00a33c6) // send_command in log_command. Workaround to prevent uart pointer cpu_reset.
-
-    {
-        ctx->base.pc_next += 4;
-    }
 
     tcg_gen_insn_start(ctx->base.pc_next);
 }
