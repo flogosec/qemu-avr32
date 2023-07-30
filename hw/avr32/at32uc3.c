@@ -23,9 +23,9 @@
 #include "qemu/module.h"
 #include "qemu/units.h"
 #include "exec/address-spaces.h"
-#include "at32uc3.h"
 #include "hw/qdev-properties.h"
 #include "sysemu/sysemu.h"
+#include "hw/avr32/at32uc3.h"
 #include "hw/avr32/at32uc3_twim.h"
 #include "hw/avr32/at32uc3_pdca.h"
 #include "hw/avr32/at32uc3_adcifa.h"
@@ -44,6 +44,7 @@ static const uint32_t twim_addr[AT32UC3C_MAX_TWI] = { 0xFFFF3800, 0xFFFF3c00, 0x
 static const uint32_t twis_addr[AT32UC3C_MAX_TWI] = { 0xFFFF4000, 0xFFFF4400, 0xFFFD3000};
 static const uint32_t intc_addr = 0xffff0000;
 static const uint32_t scif_addr = 0xffff0800;
+static const uint32_t wdt_addr = 0xffff1000;
 
 // TODO The IRQ numbers are just arbitrary
 static const int timer_irq = AT32UC3C_IRQ_TC02;
@@ -152,6 +153,14 @@ static void at32uc3_realize(DeviceState *dev_soc, Error **errp)
     sysbus_mmio_map(busdev, 0, tc_addr);
     sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(intc_dev, timer_irq));
 
+    /* WDT */
+    dev = DEVICE(&(s->wdt));
+    if (!sysbus_realize(SYS_BUS_DEVICE(&s->wdt), errp)) {
+        return;
+    }
+    busdev = SYS_BUS_DEVICE(dev);
+    sysbus_mmio_map(busdev, 0, wdt_addr);
+
     /* pdca */
     pdca_dev = DEVICE(&(s->pdca));
     s->pdca.ram = &s->sdram;
@@ -257,6 +266,8 @@ static void at32uc3c_inst_init(Object *obj)
     object_initialize_child(obj, "can", &s->can, TYPE_AT32UC3_CAN);
     object_initialize_child(obj, "scif", &s->scif, TYPE_AT32UC3_SCIF);
     object_initialize_child(obj, "intc", &s->intc, TYPE_AT32UC3_INTC);
+
+    object_initialize_child(obj, "wdt", &s->wdt, TYPE_AT32UC3_WDT);
 }
 
 static void at32uc3c_class_init(ObjectClass *oc, void *data)

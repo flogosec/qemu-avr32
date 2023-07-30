@@ -64,6 +64,9 @@ config NANOPOWER_P31U
     bool
     select I2C
 
+config AT32UC3_WDT
+    bool
+
 config NANOMIND_A3200
     bool
     select AT32UC3_MCU
@@ -79,3 +82,5 @@ config NANOMIND_A3200
     select GSSB_ISTAGE
     select FM33256B
     select NANOPOWER_P31U
+    select AT32UC3_WDT
+    select UNIMP
