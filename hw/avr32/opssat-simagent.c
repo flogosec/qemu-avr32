@@ -79,11 +79,17 @@ static int init_sim_server(void){
     server_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
     client_size = sizeof(client_addr);
 
-    if(bind(s_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0){
-        printf("[opssat_sim_thread] Failed to create socket, aborting!\n");
-        exit(-1);
-    } else {
-        printf("[opssat_sim_thread] Server bound to port 10001 @ 0.0.0.0\n");
+    int bind_res;
+    while(true){
+        bind_res = bind(s_socket, (struct sockaddr*)&server_addr, sizeof(server_addr));
+        if(bind_res < 0){
+            server_port++;
+            server_addr.sin_port = htons(server_port);
+        }
+        else {
+            printf("[opssat_sim_thread] Server bound to port %i @ 0.0.0.0\n", server_port);
+            break;
+        }
     }
     return s_socket;
 }
