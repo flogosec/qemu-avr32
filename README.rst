@@ -31,4 +31,4 @@ After you successfully build QEMU AVR32, you can use it like this:
 
 .. code-block:: shell
 
-  build/avr32-softmmu/qemu-system-avr32 -machine nanomind-a3200 -bios [path to avr32 binary file]
+  build/avr32-softmmu/qemu-system-avr32 -machine nanomind-a3200 -bios [path to OPS-SAT firmware binary file]
