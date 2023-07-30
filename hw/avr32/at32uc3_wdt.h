@@ -37,6 +37,7 @@ struct AT32UC3WDTState {
     struct ptimer_state *timer;
 
     uint32_t ctrl;
+    uint32_t ctrl_last;
     uint32_t clr;
     uint32_t sr;
 };
