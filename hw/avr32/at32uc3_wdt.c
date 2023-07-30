@@ -35,6 +35,7 @@
 #define WDT_VERSION (0x3FC)
 
 #define WDT_CTRL_KEY_MASK (0xFF << 24)
+#define WDT_CTRL_CONTENT (0x00FFFFFF)
 #define WDT_CTRL_TBAN_MASK (0x1F << 18)
 #define WDT_CTRL_CSSEL BIT(17)
 #define WDT_CTRL_CEN BIT(16)
@@ -49,12 +50,11 @@
 #define WDT_SR_WINDOW BIT(0)
 #define WDT_SR_CLEARED BIT(1)
 
-
-
 static void at32uc3_wdt_reset(DeviceState *dev)
 {
     AT32UC3WDTState *s = AT32UC3_WDT(dev);
     s->ctrl = 0x00010080;
+    s->ctrl_last = 0;
     s->clr = 0x0;
     s->sr = 0x3;
 }
@@ -62,16 +62,17 @@ static void at32uc3_wdt_reset(DeviceState *dev)
 static uint64_t at32uc_wdt_read(void *opaque, hwaddr addr, unsigned int size)
 {
     AT32UC3WDTState* s = AT32UC3_WDT(opaque);
-
     switch(addr) {
         case WDT_CTRL: {
+            printf("[at32uc_wdt_read] CTRL: 0x%04x\n", s->ctrl);
             return s->ctrl;
         }
         case WDT_CLR: {
-            printf("[at32uc_wdt_read] WDT_CLR is write-only\n");
+            printf("[at32uc_wdt_read] CLR is write-only\n");
             return 0xdeadbeef;
         }
         case WDT_SR: {
+//            printf("[at32uc_wdt_read] SR: 0x%04x\n", s->sr);
             return s->sr;
         }
         case WDT_VERSION: {
@@ -88,20 +89,27 @@ static uint64_t at32uc_wdt_read(void *opaque, hwaddr addr, unsigned int size)
 static void at32uc_wdt_write(void *opaque, hwaddr offset, uint64_t val64, unsigned int size)
 {
     AT32UC3WDTState* s = opaque;
-
     switch(offset) {
         case WDT_CTRL: {
-            if ((s->ctrl & WDT_CTRL_KEY_MASK) == 0x55000000 && (val64 & WDT_CTRL_KEY_MASK )== 0xAA000000)
-            {
-                uint32_t new_ctrl = val64 & 0x00FFFFFF;
-                s->ctrl = new_ctrl;
+            if ((val64 & WDT_CTRL_KEY_MASK) == 0x55000000) {
+                s->ctrl_last = val64;
+                return;
+            }
+            if ((val64 & WDT_CTRL_KEY_MASK) == 0xAA000000){
+                if ((val64 & WDT_CTRL_CONTENT) == (s->ctrl_last & WDT_CTRL_CONTENT)) {
+                    uint32_t new_ctrl = val64 & WDT_CTRL_CONTENT;
+                    s->ctrl = new_ctrl;
+                    printf("[at32uc_wdt_write] CTRL: 0x%08x\n", s->ctrl);
+
+                } else {
+                    printf("[at32uc_wdt_write] CTRL invalid!\n");
+                    return;
+                }
             }
             break;
         }
         case WDT_CLR: {
-            printf("[at32uc_wdt_write] WDT_CLR write: 0x%04lx\n", val64);
-
-            if ((s->clr & WDT_CLR_KEY_MASK) == 0x55000000 && (val64 & (WDT_CLR_KEY_MASK | WDT_CLR_WDTCLR)) == 0xAA000001)
+            if (s->clr == 0x55000001 && val64  == 0xAA000001)
             {
                 uint32_t timeout = 1 << (((s->ctrl & WDT_CTRL_PSEL_MASK) >> 8) + 1);
                 s->clr = 0;
@@ -122,6 +130,10 @@ static void at32uc_wdt_write(void *opaque, hwaddr offset, uint64_t val64, unsign
             break;
         }
         case WDT_SR:
+        {
+            printf("[at32uc_wdt_read] SR is read-only!\n");
+            return;
+        }
         case WDT_VERSION: {
             qemu_log_mask(LOG_GUEST_ERROR,
                           "%s: write to read-only reg at offset 0x%"
@@ -137,6 +149,19 @@ static void at32uc_wdt_write(void *opaque, hwaddr offset, uint64_t val64, unsign
     }
 }
 
+static void at32uc3_wdt_expired(void *opaque)
+{
+    AT32UC3WDTState *s = AT32UC3_WDT(opaque);
+
+    bool enabled = s->ctrl & WDT_CTRL_EN;
+
+    /* Perform watchdog action if watchdog is enabled and can trigger reset */
+    if (enabled) {
+        printf("[at32uc_wdt] EXPIRED\n");
+        watchdog_perform_action();
+    }
+}
+
 static const MemoryRegionOps wdt_ops = {
         .read = at32uc_wdt_read,
         .write = at32uc_wdt_write,
@@ -146,18 +171,6 @@ static const MemoryRegionOps wdt_ops = {
                 .max_access_size = 4
         }
 };
-
-static void at32uc3_wdt_expired(void *opaque)
-{
-    AT32UC3WDTState *s = AT32UC3_WDT(opaque);
-
-    bool enabled = s->ctrl & WDT_CTRL_EN;
-
-    /* Perform watchdog action if watchdog is enabled and can trigger reset */
-    if (enabled) {
-        watchdog_perform_action();
-    }
-}
 
 static void at32uc3_wdt_realize(DeviceState *dev, Error **errp)
 {
