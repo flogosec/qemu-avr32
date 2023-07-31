@@ -38,7 +38,11 @@ struct AT32UC3UARTState {
 
     uint8_t num_cs;
     qemu_irq *cs_lines;
-
+    u_int32_t rhr;
+    QemuThread uart_thread;
+    struct sockaddr_in server_addr;
+    int buf_idx;
+    char buf[10000];
 };
 
 #endif //QEMU_AVR32_AVR32_UART_H

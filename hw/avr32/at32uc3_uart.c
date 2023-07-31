@@ -21,21 +21,41 @@
 #include "qemu/module.h"
 #include "hw/avr32/at32uc3_uart.h"
 #include "migration/vmstate.h"
+#include "qemu/main-loop.h"
+
+
+#define SR 0x4 //Status Register
+#define IMR 0x14 //Interrupt Mask Register
+#define RHR 0x18 //Receive Holding Register
+#define THR 0x1C //Transmit Holding Register
 
 static int baudrate = 0;
 static FILE *fileOut;
+int uart_client_sock = -1;
+int uart_server_port = 10101;
+int uart_s_socket;
+struct sockaddr_in uart_client_addr, uart_server_addr;
+socklen_t uart_client_size;
+AT32UC3UARTState* uart_state;
+static bool uart_client_connected = false;
 
 static uint64_t at32uc_uart_read(void *opaque, hwaddr addr, unsigned int size)
 {
+    AT32UC3UARTState* s = AT32UC3_UART(opaque);
+
     int offset = (int) addr;
     int returnValue = 0;
     switch (offset) {
-        case 0x4:
+        case SR:
             returnValue = baudrate;
             break;
-        case 0x14:
+        case IMR:
             returnValue = 0xFF;
             break;
+        case RHR:{
+            printf("[opssat_uart_thread] READ: %c!\n", s->rhr);
+            returnValue = s->rhr;
+        }
         default:
             break;
     }
@@ -44,28 +64,117 @@ static uint64_t at32uc_uart_read(void *opaque, hwaddr addr, unsigned int size)
 
 static void at32uc_uart_write(void *opaque, hwaddr addr, uint64_t val64, unsigned int size)
 {
+    AT32UC3UARTState* s = AT32UC3_UART(opaque);
     int offset = (int) addr;
     switch (offset) {
-        case 0x4:
-            baudrate = val64;
+        case SR:
+            printf("[at32uc3_uart_write] SR is read-only!\n");
             break;
-        case 0x1c:
+        case THR:
             if(val64 == 0x30){
                 return;
             }
-            if(val64 > 0 && val64 < 255){
-            }
-            else{
+            s->buf[s->buf_idx] = (char)val64;
+            s->buf_idx++;
+            if(uart_client_connected){
+                send(uart_client_sock, &s->buf[s->buf_idx-1], 1, 0);
             }
             fprintf(fileOut, "%c", (char)val64);
             fflush(fileOut);
             break;
-        case 0x0:
-        case 0x24:
-        case 0x28:
         default:
             break;
     }
+}
+
+static int init_uart_server(void){
+    int uart_s_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+    uart_server_addr.sin_family = AF_INET;
+    uart_server_addr.sin_port = htons(uart_server_port);
+    uart_server_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
+    uart_client_size = sizeof(uart_client_addr);
+
+    int bind_res;
+    while(true){
+        bind_res = bind(uart_s_socket, (struct sockaddr*)&uart_server_addr, sizeof(uart_server_addr));
+        if(bind_res < 0){
+            uart_server_port++;
+            uart_server_addr.sin_port = htons(uart_server_port);
+        }
+        else {
+            printf("[opssat_uart_thread] Server bound to port %i @ 0.0.0.0\n", uart_server_port);
+            break;
+        }
+    }
+    return uart_s_socket;
+}
+
+
+static int handle_new_client(AT32UC3UARTState *s){
+    if (uart_client_sock < 0) {
+        printf("[opssat_uart_thread] Waiting for connection...\n");
+        uart_client_sock = accept(uart_s_socket, (struct sockaddr*)&uart_client_addr, &uart_client_size);
+        if (uart_client_sock < 0) {
+            printf("[opssat_uart_thread] Client acceptance error\n");
+            return 0;
+        }
+        printf("=================================================================\n");
+        printf("\n");
+        printf("\n");
+        printf("\n");
+        printf("[opssat_uart_thread] New client connected from %s\n", inet_ntoa(uart_client_addr.sin_addr));
+        for(int i =0; i < s->buf_idx; i++){
+            send(uart_client_sock, &s->buf[i], 1, 0);
+        }
+    }
+    return 1;
+}
+
+static void* uart_thread(void *opaque){
+    uart_s_socket = init_uart_server();
+    AT32UC3UARTState *s = AT32UC3_UART(opaque);
+
+    while(1) {
+
+        int listen_result = listen(uart_s_socket, 1);
+        if(listen_result < 0){
+            printf("[opssat_uart_thread] TCP listening error. Restarting loop.\n");
+            continue;
+        }
+
+        if(!handle_new_client(s)){
+            continue;
+        }
+        uart_client_connected = true;
+
+        char incoming_message[1];
+        int recv_result;
+        while(1){
+            recv_result = recv(uart_client_sock, incoming_message, sizeof(incoming_message), 0);
+            if(recv_result > 0){
+                printf("[opssat_uart_thread] INPUT: %c (0x%x)\n", incoming_message[0], incoming_message[0]);
+                s->rhr = incoming_message[0];
+                qemu_mutex_lock_iothread();
+                qemu_set_irq(s->irq, 2);
+                qemu_mutex_unlock_iothread();
+            }
+            else if(recv_result <= 0){
+                printf("[opssat_uart_thread] CLOSED!\n");
+                break;
+            }
+        }
+        /*
+
+        int recv_result = readMessage();
+        if(recv_result <= 0){
+            continue;
+        }
+        qemu_mutex_lock_iothread();
+
+        handle_received_message();*/
+    }
+    return NULL;
 }
 
 static const MemoryRegionOps uart_ops = {
@@ -96,6 +205,10 @@ static void at32uc3_uart_realize(DeviceState *dev, Error **errp)
     sysbus_init_mmio(sbd, &s->mmio);
 
     s->irqline = -1;
+    s->buf_idx = 0;
+    memset(s->buf, '\0', sizeof(s->buf));
+    qemu_thread_create(&s->uart_thread, "nanomind.uart", uart_thread, s, QEMU_THREAD_JOINABLE);
+
 }
 
 static void at32uc3_uart_reset(DeviceState *dev)
