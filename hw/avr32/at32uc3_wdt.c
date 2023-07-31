@@ -95,16 +95,16 @@ static void at32uc_wdt_write(void *opaque, hwaddr offset, uint64_t val64, unsign
                 s->ctrl_last = val64;
                 return;
             }
-            if ((val64 & WDT_CTRL_KEY_MASK) == 0xAA000000){
+            if ((val64 & WDT_CTRL_KEY_MASK) == 0xAA000000 && (s->ctrl_last & WDT_CTRL_KEY_MASK) == 0x55000000){
                 if ((val64 & WDT_CTRL_CONTENT) == (s->ctrl_last & WDT_CTRL_CONTENT)) {
                     uint32_t new_ctrl = val64 & WDT_CTRL_CONTENT;
                     s->ctrl = new_ctrl;
                     printf("[at32uc_wdt_write] CTRL: 0x%08x\n", s->ctrl);
-
                 } else {
                     printf("[at32uc_wdt_write] CTRL invalid!\n");
-                    return;
                 }
+                s->ctrl_last = 0;
+                return;
             }
             break;
         }
