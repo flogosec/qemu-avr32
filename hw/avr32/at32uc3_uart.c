@@ -23,13 +23,20 @@
 #include "migration/vmstate.h"
 #include "qemu/main-loop.h"
 
-
-#define SR 0x4 //Status Register
-#define IMR 0x14 //Interrupt Mask Register
+#define CR 0x0 //Control Register
+#define MR 0x4 //Mode Register
+#define IER 0x8 //Interrupt Enable Register
+#define IDR 0xC //Interrupt Disable Register
+#define IMR 0x10 //Interrupt Mask Register
+#define CSR 0x14 //Interrupt Mask Register
 #define RHR 0x18 //Receive Holding Register
 #define THR 0x1C //Transmit Holding Register
+#define RTOR 0x24 //Receiver Time-out Register
+#define TTGR 0x28 //Transmitter Timeguard Register
 
-static int baudrate = 0;
+#define CSR_RXRDY (1 << 0)
+#define CSR_TXRDY (1 << 1)
+
 static FILE *fileOut;
 int uart_client_sock = -1;
 int uart_server_port = 10101;
@@ -46,17 +53,37 @@ static uint64_t at32uc_uart_read(void *opaque, hwaddr addr, unsigned int size)
     int offset = (int) addr;
     int returnValue = 0;
     switch (offset) {
-        case SR:
-            returnValue = baudrate;
+        case MR:
+            returnValue = s->mr;
+            printf("[opssat_uart_read] MR: 0x%x\n", returnValue);
             break;
         case IMR:
-            returnValue = 0xFF;
+            returnValue = s->imr;
+            printf("[opssat_uart_read] IMR: 0x%x\n", returnValue);
             break;
+        case CSR:{
+            returnValue = s->csr;
+//            printf("[opssat_uart_read] CSR: 0x%x\n", returnValue);
+            break;
+        }
         case RHR:{
-            printf("[opssat_uart_thread] READ: %c!\n", s->rhr);
             returnValue = s->rhr;
+            printf("[opssat_uart_read] RHR: 0x%x\n", returnValue);
+            s->csr &= ~CSR_RXRDY;
+            break;
+        }
+        case RTOR:{
+            returnValue = s->rtor;
+            printf("[opssat_uart_read] RTOR: 0x%x\n", returnValue);
+            break;
+        }
+        case TTGR:{
+            returnValue = s->ttgr;
+            printf("[opssat_uart_read] TTGR: 0x%x\n", returnValue);
+            break;
         }
         default:
+            printf("[opssat_uart_read] Not implemented: 0x%lx\n", addr);
             break;
     }
     return returnValue;
@@ -67,13 +94,24 @@ static void at32uc_uart_write(void *opaque, hwaddr addr, uint64_t val64, unsigne
     AT32UC3UARTState* s = AT32UC3_UART(opaque);
     int offset = (int) addr;
     switch (offset) {
-        case SR:
-            printf("[at32uc3_uart_write] SR is read-only!\n");
+        case CR:{
+            s->cr = (u_int32_t) val64;
+            printf("[opssat_uart_write] CR: 0x%lx\n", val64);
             break;
+        }
+        case MR:{
+            s->mr = (u_int32_t) val64;
+            printf("[opssat_uart_write] Mode: 0x%lx\n", val64);
+            break;
+        }
+        case IDR:{
+            printf("[opssat_uart_write] IDR: 0x%lx. New IMR: ", val64);
+            s->idr = (u_int32_t) val64;
+            s->imr &= ~s->idr;
+            printf("0x%x\n", s->imr);
+            break;
+        }
         case THR:
-            if(val64 == 0x30){
-                return;
-            }
             s->buf[s->buf_idx] = (char)val64;
             s->buf_idx++;
             if(uart_client_connected){
@@ -82,7 +120,16 @@ static void at32uc_uart_write(void *opaque, hwaddr addr, uint64_t val64, unsigne
             fprintf(fileOut, "%c", (char)val64);
             fflush(fileOut);
             break;
+        case RTOR:{
+            s->rtor = (u_int32_t) val64;
+            break;
+        }
+        case TTGR:{
+            s->ttgr = (u_int32_t) val64;
+            break;
+        }
         default:
+            printf("[opssat_uart_write] Not implemented: 0x%lx\n", addr);
             break;
     }
 }
@@ -147,6 +194,11 @@ static void* uart_thread(void *opaque){
             continue;
         }
         uart_client_connected = true;
+        printf("[opssat_uart_thread] Sending buffered messaged: %i bytes\n", s->buf_idx);
+
+        for(int i= 0; i < s->buf_idx; i++){
+            send(uart_client_sock, &s->buf[i], 1, 0);
+        }
 
         char incoming_message[1];
         int recv_result;
@@ -155,6 +207,7 @@ static void* uart_thread(void *opaque){
             if(recv_result > 0){
                 printf("[opssat_uart_thread] INPUT: %c (0x%x)\n", incoming_message[0], incoming_message[0]);
                 s->rhr = incoming_message[0];
+                s->csr |= CSR_RXRDY;
                 qemu_mutex_lock_iothread();
                 qemu_set_irq(s->irq, 2);
                 qemu_mutex_unlock_iothread();
@@ -164,15 +217,6 @@ static void* uart_thread(void *opaque){
                 break;
             }
         }
-        /*
-
-        int recv_result = readMessage();
-        if(recv_result <= 0){
-            continue;
-        }
-        qemu_mutex_lock_iothread();
-
-        handle_received_message();*/
     }
     return NULL;
 }
@@ -208,12 +252,13 @@ static void at32uc3_uart_realize(DeviceState *dev, Error **errp)
     s->buf_idx = 0;
     memset(s->buf, '\0', sizeof(s->buf));
     qemu_thread_create(&s->uart_thread, "nanomind.uart", uart_thread, s, QEMU_THREAD_JOINABLE);
-
 }
 
 static void at32uc3_uart_reset(DeviceState *dev)
 {
-
+    AT32UC3UARTState *s = AT32UC3_UART(dev);
+    s->csr = 0 | CSR_TXRDY;
+    //TODO: Implement all registers
 }
 
 static void at32uc3_uart_class_init(ObjectClass *klass, void *data)

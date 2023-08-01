@@ -38,7 +38,17 @@ struct AT32UC3UARTState {
 
     uint8_t num_cs;
     qemu_irq *cs_lines;
-    u_int32_t rhr;
+    u_int32_t cr; //control reg
+    u_int32_t mr; //mode red
+    u_int32_t imr; //interrupt mask reg
+    u_int32_t csr; //Channel Status Register
+    u_int32_t ier; //interrupt enable reg
+    u_int32_t idr; //interrupt disable reg
+    u_int32_t rhr; //Receiver Holding Register
+    u_int32_t rtor; //Receiver Time-out Register
+    u_int32_t ttgr; //Transmitter Timeguard Register
+
+
     QemuThread uart_thread;
     struct sockaddr_in server_addr;
     int buf_idx;
