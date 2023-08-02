@@ -101,7 +101,7 @@ static void at32uc_uart_write(void *opaque, hwaddr addr, uint64_t val64, unsigne
         }
         case MR:{
             s->mr = (u_int32_t) val64;
-            printf("[opssat_uart%i_write] Mode: 0x%lx\n", s->uart_id, val64);
+            printf("[opssat_uart%i_write] MR: 0x%lx\n", s->uart_id, val64);
             break;
         }
         case IDR:{
