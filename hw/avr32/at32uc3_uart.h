@@ -34,7 +34,7 @@ struct AT32UC3UARTState {
     MemoryRegion mmio;
 
     qemu_irq irq;
-    int irqline;
+//    int irqline;
 
     uint8_t num_cs;
     qemu_irq *cs_lines;
@@ -47,6 +47,7 @@ struct AT32UC3UARTState {
     u_int32_t rhr; //Receiver Holding Register
     u_int32_t rtor; //Receiver Time-out Register
     u_int32_t ttgr; //Transmitter Timeguard Register
+    int uart_id;
 
 
     QemuThread uart_thread;

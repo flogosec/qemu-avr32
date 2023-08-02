@@ -43,7 +43,11 @@
 #define AT32UC3C_IRQ_TC02 10
 
 #define AT32UC3C_IRQ_TWIM0 15
-#define AT32UC3C_IRQ_UART 18
+#define AT32UC3C_IRQ_UART0 3
+#define AT32UC3C_IRQ_UART1 4
+#define AT32UC3C_IRQ_UART2 5
+#define AT32UC3C_IRQ_UART3 6
+#define AT32UC3C_IRQ_UART4 7
 #define AT32UC3C_IRQ_TWIM1 25
 #define AT32UC3C_IRQ_TWIM2 26
 
@@ -77,8 +81,11 @@ struct AT32UC3CSocState {
     AT32UC3TWISState twis[AT32UC3C_MAX_TWI];
     AT32UC3PDCAState pdca;
     AT32UC3ADCIFAState adcifa;
-    AT32UC3UARTState uart;
+    AT32UC3UARTState uart0;
     AT32UC3UARTState uart1;
+    AT32UC3UARTState uart2;
+    AT32UC3UARTState uart3;
+    AT32UC3UARTState uart4;
     AT32UC3CANState can;
     AT32UC3SCIFState scif;
     AT32UC3INTCState intc;

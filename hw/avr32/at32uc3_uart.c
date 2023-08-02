@@ -55,35 +55,35 @@ static uint64_t at32uc_uart_read(void *opaque, hwaddr addr, unsigned int size)
     switch (offset) {
         case MR:
             returnValue = s->mr;
-            printf("[opssat_uart_read] MR: 0x%x\n", returnValue);
+            printf("[opssat_uart%i_read] MR: 0x%x\n", s->uart_id, returnValue);
             break;
         case IMR:
             returnValue = s->imr;
-            printf("[opssat_uart_read] IMR: 0x%x\n", returnValue);
+            printf("[opssat_uart%i_read] IMR: 0x%x\n", s->uart_id, returnValue);
             break;
         case CSR:{
             returnValue = s->csr;
-//            printf("[opssat_uart_read] CSR: 0x%x\n", returnValue);
+//            printf("[opssat_uart%i_read] CSR: 0x%x\n", returnValue);
             break;
         }
         case RHR:{
             returnValue = s->rhr;
-            printf("[opssat_uart_read] RHR: 0x%x\n", returnValue);
+            printf("[opssat_uart%i_read] RHR: 0x%x\n", s->uart_id, returnValue);
             s->csr &= ~CSR_RXRDY;
             break;
         }
         case RTOR:{
             returnValue = s->rtor;
-            printf("[opssat_uart_read] RTOR: 0x%x\n", returnValue);
+            printf("[opssat_uart%i_read] RTOR: 0x%x\n", s->uart_id, returnValue);
             break;
         }
         case TTGR:{
             returnValue = s->ttgr;
-            printf("[opssat_uart_read] TTGR: 0x%x\n", returnValue);
+            printf("[opssat_uart%i_read] TTGR: 0x%x\n", s->uart_id, returnValue);
             break;
         }
         default:
-            printf("[opssat_uart_read] Not implemented: 0x%lx\n", addr);
+            printf("[opssat_uart%i_read] Not implemented: 0x%lx\n", s->uart_id, addr);
             break;
     }
     return returnValue;
@@ -96,16 +96,16 @@ static void at32uc_uart_write(void *opaque, hwaddr addr, uint64_t val64, unsigne
     switch (offset) {
         case CR:{
             s->cr = (u_int32_t) val64;
-            printf("[opssat_uart_write] CR: 0x%lx\n", val64);
+            printf("[opssat_uart%i_write] CR: 0x%lx\n", s->uart_id, val64);
             break;
         }
         case MR:{
             s->mr = (u_int32_t) val64;
-            printf("[opssat_uart_write] Mode: 0x%lx\n", val64);
+            printf("[opssat_uart%i_write] Mode: 0x%lx\n", s->uart_id, val64);
             break;
         }
         case IDR:{
-            printf("[opssat_uart_write] IDR: 0x%lx. New IMR: ", val64);
+            printf("[opssat_uart%i_write] IDR: 0x%lx. New IMR: ", s->uart_id, val64);
             s->idr = (u_int32_t) val64;
             s->imr &= ~s->idr;
             printf("0x%x\n", s->imr);
@@ -129,7 +129,7 @@ static void at32uc_uart_write(void *opaque, hwaddr addr, uint64_t val64, unsigne
             break;
         }
         default:
-            printf("[opssat_uart_write] Not implemented: 0x%lx\n", addr);
+            printf("[opssat_uart%i_write] Not implemented: 0x%lx\n", s->uart_id, addr);
             break;
     }
 }
@@ -150,7 +150,6 @@ static int init_uart_server(void){
             uart_server_addr.sin_port = htons(uart_server_port);
         }
         else {
-            printf("[opssat_uart_thread] Server bound to port %i @ 0.0.0.0\n", uart_server_port);
             break;
         }
     }
@@ -160,17 +159,17 @@ static int init_uart_server(void){
 
 static int handle_new_client(AT32UC3UARTState *s){
     if (uart_client_sock < 0) {
-        printf("[opssat_uart_thread] Waiting for connection...\n");
+        printf("[opssat_uart%i_thread] Waiting for connection...\n", s->uart_id);
         uart_client_sock = accept(uart_s_socket, (struct sockaddr*)&uart_client_addr, &uart_client_size);
         if (uart_client_sock < 0) {
-            printf("[opssat_uart_thread] Client acceptance error\n");
+            printf("[opssat_uart%i_thread] Client acceptance error\n", s->uart_id);
             return 0;
         }
         printf("=================================================================\n");
         printf("\n");
         printf("\n");
         printf("\n");
-        printf("[opssat_uart_thread] New client connected from %s\n", inet_ntoa(uart_client_addr.sin_addr));
+        printf("[opssat_uart%i_thread] New client connected from %s\n", s->uart_id, inet_ntoa(uart_client_addr.sin_addr));
         for(int i =0; i < s->buf_idx; i++){
             send(uart_client_sock, &s->buf[i], 1, 0);
         }
@@ -179,14 +178,18 @@ static int handle_new_client(AT32UC3UARTState *s){
 }
 
 static void* uart_thread(void *opaque){
-    uart_s_socket = init_uart_server();
     AT32UC3UARTState *s = AT32UC3_UART(opaque);
+    while(s->uart_id == 0){
+        usleep(100);
+    }
+    s->uart_id = s->uart_id - 10;
+    uart_s_socket = init_uart_server();
+    printf("[opssat_uart%i_thread] Server bound to port %i @ 0.0.0.0\n", s->uart_id, uart_server_port);
 
     while(1) {
-
         int listen_result = listen(uart_s_socket, 1);
         if(listen_result < 0){
-            printf("[opssat_uart_thread] TCP listening error. Restarting loop.\n");
+            printf("[opssat_uart%i_thread] TCP listening error. Restarting loop.\n", s->uart_id);
             continue;
         }
 
@@ -194,7 +197,7 @@ static void* uart_thread(void *opaque){
             continue;
         }
         uart_client_connected = true;
-        printf("[opssat_uart_thread] Sending buffered messaged: %i bytes\n", s->buf_idx);
+        printf("[opssat_uart%i_thread] Sending buffered messaged: %i bytes\n", s->uart_id, s->buf_idx);
 
         for(int i= 0; i < s->buf_idx; i++){
             send(uart_client_sock, &s->buf[i], 1, 0);
@@ -205,7 +208,7 @@ static void* uart_thread(void *opaque){
         while(1){
             recv_result = recv(uart_client_sock, incoming_message, sizeof(incoming_message), 0);
             if(recv_result > 0){
-                printf("[opssat_uart_thread] INPUT: %c (0x%x)\n", incoming_message[0], incoming_message[0]);
+                printf("[opssat_uart%i_thread] INPUT: %c (0x%x)\n", s->uart_id, incoming_message[0], incoming_message[0]);
                 s->rhr = incoming_message[0];
                 s->csr |= CSR_RXRDY;
                 qemu_mutex_lock_iothread();
@@ -213,7 +216,7 @@ static void* uart_thread(void *opaque){
                 qemu_mutex_unlock_iothread();
             }
             else if(recv_result <= 0){
-                printf("[opssat_uart_thread] CLOSED!\n");
+                printf("[opssat_uart%i_thread] CLOSED!\n", s->uart_id);
                 break;
             }
         }
@@ -248,7 +251,7 @@ static void at32uc3_uart_realize(DeviceState *dev, Error **errp)
     memory_region_init_io(&s->mmio, OBJECT(s), &uart_ops, s, TYPE_AT32UC3_UART, 0x100); // R_MAX * 4 = size of region
     sysbus_init_mmio(sbd, &s->mmio);
 
-    s->irqline = -1;
+//    s->irqline = -1;
     s->buf_idx = 0;
     memset(s->buf, '\0', sizeof(s->buf));
     qemu_thread_create(&s->uart_thread, "nanomind.uart", uart_thread, s, QEMU_THREAD_JOINABLE);

@@ -30,11 +30,11 @@ static const uint8_t IRQ_GRP_LINE[][2] = {
         [0] = {0xff, 0xff},
         [1] = {0xff, 0xff},
         [2] = {0xff, 0xff},
-        [3] = {0xff, 0xff},
-        [4] = {0xff, 0xff},
-        [5] = {0xff, 0xff},
-        [6] = {0xff, 0xff},
-        [7] = {0xff, 0xff},
+        [AT32UC3C_IRQ_UART0] = {19, 0},
+        [AT32UC3C_IRQ_UART1] = {20, 0},
+        [AT32UC3C_IRQ_UART2] = {21, 0},
+        [AT32UC3C_IRQ_UART3] = {22, 0},
+        [AT32UC3C_IRQ_UART4] = {44, 0},
         [8] = {0xff, 0xff},
         [9] = {0xff, 0xff},
         [AT32UC3C_IRQ_TC02] = {33, 2},
@@ -45,7 +45,7 @@ static const uint8_t IRQ_GRP_LINE[][2] = {
         [AT32UC3C_IRQ_TWIM0] = {25, 0},
         [16] = {0xff, 0xff},
         [17] = {0xff, 0xff},
-        [AT32UC3C_IRQ_UART] = {44, 0},
+        [18] = {0xff, 0xff},
         [19] = {0xff, 0xff},
         [20] = {0xff, 0xff},
         [21] = {0xff, 0xff},
@@ -83,6 +83,7 @@ static uint64_t at32uc_intc_read(void *opaque, hwaddr addr, unsigned int size)
         return s->request_regs[(addr - 0x100) >> 2];
     } else if (addr <= 0x20c) {
         int cause_reg_idx = 3 - ((addr - 0x200) >> 2);
+//        printf("[at32uc_intc_read] Reading cause reg 0x%lx: %i\n", addr, s->cause[cause_reg_idx]);
         return s->cause[cause_reg_idx];
     } else {
         printf("[at32uc_intc_read] Unknown reading unknown addr=0x%lx\n", addr);
@@ -175,7 +176,6 @@ static void avr32_set_irq(void *opaque, int irq, int level) {
         cpu_interrupt(cs, CPU_INTERRUPT_HARD);
     } else {
         s->request_regs[grp_line[0]] &= ~(1 << grp_line[1]);
-
         // Reevaluate the lines
         s->grp_req_lines &= ((uint64_t) !!s->request_regs[grp_line[0]]) << grp_line[0];
 

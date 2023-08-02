@@ -39,7 +39,11 @@ static const uint32_t pdca_addr = 0xfffd0000;
 static const uint32_t can_addr = 0xfffd1c00;
 static const uint32_t tc_addr = 0xfffd2000;
 static const uint32_t adcifa_addr = 0xfffd2400;
-static const uint32_t uart_addr = 0xfffd2800;
+static const uint32_t uart0_addr = 0xFFFF2800;
+static const uint32_t uart1_addr = 0xFFFD1400;
+static const uint32_t uart2_addr = 0xFFFF2C00;
+static const uint32_t uart3_addr = 0xFFFF3000;
+static const uint32_t uart4_addr = 0xfffd2800;
 static const uint32_t twim_addr[AT32UC3C_MAX_TWI] = { 0xFFFF3800, 0xFFFF3c00, 0xFFFD2c00};
 static const uint32_t twis_addr[AT32UC3C_MAX_TWI] = { 0xFFFF4000, 0xFFFF4400, 0xFFFD3000};
 static const uint32_t intc_addr = 0xffff0000;
@@ -52,9 +56,14 @@ static const int twim_irq[AT32UC3C_MAX_TWI] = {AT32UC3C_IRQ_TWIM0, AT32UC3C_IRQ_
 static const int twis_irq[AT32UC3C_MAX_TWI] = {AT32UC3C_IRQ_TWIS0, AT32UC3C_IRQ_TWIS1, AT32UC3C_IRQ_TWIS2};
 static const int pdca_irq = 16;
 static const int adcifa_irq = 17;
-static const int uart_irq = 18;
 static const int can_irq = 19;
 static const int scif_irq = 20;
+
+static const int uart0_irq = 3;
+static const int uart1_irq = 4;
+static const int uart2_irq = 5;
+static const int uart3_irq = 6;
+static const int uart4_irq = 7;
 
 const int PDCA_TWIS_RX_PIDS[] = {AT32UC_PDCA_PID_TWIS0_RX, AT32UC_PDCA_PID_TWIS1_RX, AT32UC_PDCA_PID_TWIS2_RX};
 const int PDCA_TWIM_RX_PIDS[] = {AT32UC_PDCA_PID_TWIM0_RX, AT32UC_PDCA_PID_TWIM1_RX, AT32UC_PDCA_PID_TWIM2_RX};
@@ -213,13 +222,55 @@ static void at32uc3_realize(DeviceState *dev_soc, Error **errp)
     sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(intc_dev, adcifa_irq));
 
     /* uart */
-    dev = DEVICE(&(s->uart));
-    if (!sysbus_realize(SYS_BUS_DEVICE(&s->uart), errp)) {
+    dev = DEVICE(&(s->uart0));
+    if (!sysbus_realize(SYS_BUS_DEVICE(&s->uart0), errp)) {
         return;
     }
     busdev = SYS_BUS_DEVICE(dev);
-    sysbus_mmio_map(busdev, 0, uart_addr);
-    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(intc_dev,uart_irq));
+    sysbus_mmio_map(busdev, 0, uart0_addr);
+    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(intc_dev,uart0_irq));
+    AT32UC3UARTState *us = AT32UC3_UART(dev);
+    us->uart_id = 10;
+
+    dev = DEVICE(&(s->uart1));
+    if (!sysbus_realize(SYS_BUS_DEVICE(&s->uart1), errp)) {
+        return;
+    }
+    busdev = SYS_BUS_DEVICE(dev);
+    sysbus_mmio_map(busdev, 0, uart1_addr);
+    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(intc_dev,uart1_irq));
+    us = AT32UC3_UART(dev);
+    us->uart_id = 11;
+
+    dev = DEVICE(&(s->uart2));
+    if (!sysbus_realize(SYS_BUS_DEVICE(&s->uart2), errp)) {
+        return;
+    }
+    busdev = SYS_BUS_DEVICE(dev);
+    sysbus_mmio_map(busdev, 0, uart2_addr);
+    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(intc_dev,uart2_irq));
+    us = AT32UC3_UART(dev);
+    us->uart_id = 12;
+
+    dev = DEVICE(&(s->uart3));
+    if (!sysbus_realize(SYS_BUS_DEVICE(&s->uart3), errp)) {
+        return;
+    }
+    busdev = SYS_BUS_DEVICE(dev);
+    sysbus_mmio_map(busdev, 0, uart3_addr);
+    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(intc_dev,uart3_irq));
+    us = AT32UC3_UART(dev);
+    us->uart_id = 13;
+
+    dev = DEVICE(&(s->uart4));
+    if (!sysbus_realize(SYS_BUS_DEVICE(&s->uart4), errp)) {
+        return;
+    }
+    busdev = SYS_BUS_DEVICE(dev);
+    sysbus_mmio_map(busdev, 0, uart4_addr);
+    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(intc_dev,uart4_irq));
+    us = AT32UC3_UART(dev);
+    us->uart_id = 14;
 
     /* can */
     dev = DEVICE(&(s->can));
@@ -262,7 +313,11 @@ static void at32uc3c_inst_init(Object *obj)
     object_initialize_child(obj, "timer", &s->timer, TYPE_AT32UC3_TIMER);
     object_initialize_child(obj, "pdca", &s->pdca, TYPE_AT32UC3_PDCA);
     object_initialize_child(obj, "adcifa", &s->adcifa, TYPE_AT32UC3_ADCIFA);
-    object_initialize_child(obj, "uart", &s->uart, TYPE_AT32UC3_UART);
+    object_initialize_child(obj, "uart0", &s->uart0, TYPE_AT32UC3_UART);
+    object_initialize_child(obj, "uart1", &s->uart1, TYPE_AT32UC3_UART);
+    object_initialize_child(obj, "uart2", &s->uart2, TYPE_AT32UC3_UART);
+    object_initialize_child(obj, "uart3", &s->uart3, TYPE_AT32UC3_UART);
+    object_initialize_child(obj, "uart4", &s->uart4, TYPE_AT32UC3_UART);
     object_initialize_child(obj, "can", &s->can, TYPE_AT32UC3_CAN);
     object_initialize_child(obj, "scif", &s->scif, TYPE_AT32UC3_SCIF);
     object_initialize_child(obj, "intc", &s->intc, TYPE_AT32UC3_INTC);
@@ -293,7 +348,7 @@ static void at32uc3c0512c_class_init(ObjectClass *oc, void *data)
     at32uc3->twim_count = 3;
     at32uc3->twis_count = 3;
     at32uc3->adcifa_count = 1;
-    at32uc3->uart_count = 1;
+    at32uc3->uart_count = 5;
     at32uc3->scif_count = 1;
     at32uc3->intc_count = 1;
 }
