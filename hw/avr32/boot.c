@@ -26,74 +26,7 @@
 #include <string.h>
 #include "hw/core/tcg-cpu-ops.h"
 #include "exec/exec-all.h"
-
-static bool avr32_load_elf_file(AVR32ACPU *cpu, char *filename, MemoryRegion *program_mr);
-static bool avr32_is_elf_file(char *filename);
-static void avr32_convert_elf_header(Elf32_Ehdr *header);
-static uint16_t avr32_elf_convert_short(short num);
-static void avr32_elf_read_section_headers(Elf32_Ehdr *header, FILE* file, Elf32_Shdr** sh_table);
-void avr32_elf_read_string_table(Elf32_Ehdr *header, FILE* file, Elf32_Shdr** sh_table, char *strtable);
-void avr32_copy_sections(int e_shnum, FILE* file, Elf32_Shdr** sh_table, char *strtable, MemoryRegion *program_mr);
-void avr32_copy_text_section(int e_shnum, FILE* file, Elf32_Shdr** sh_table, char *strtable, FILE* output);
-void avr32_copy_data_section(int e_shnum, FILE* file, Elf32_Shdr** sh_table, char *strtable, FILE* output);
-
-
-
-static int avr32_elf_convert_int(int num){
-    uint32_t b0,b1,b2,b3;
-    b0 = (num & 0x000000ff) << 24u;
-    b1 = (num & 0x0000ff00) << 8u;
-    b2 = (num & 0x00ff0000) >> 8u;
-    b3 = (num & 0xff000000) >> 24u;
-    return b0 | b1 | b2 | b3;
-}
-
-static uint16_t avr32_elf_convert_short(short num){
-    uint32_t b0,b1;
-    b0 = (num & 0x00ff) << 8u;
-    b1 = (num & 0xff00) >> 8u;
-    return b0 | b1;
-}
-
-static void avr32_convert_elf_header(Elf32_Ehdr *header){
-    // We only need some headers
-    header->e_machine = avr32_elf_convert_short(header->e_machine);
-    header->e_shoff = avr32_elf_convert_int(header->e_shoff);
-    header->e_shentsize = avr32_elf_convert_short(header->e_shentsize);
-    header->e_shnum = avr32_elf_convert_short(header->e_shnum);
-    header->e_shstrndx = avr32_elf_convert_short(header->e_shstrndx);
-}
-
-static void avr32_elf_read_section_headers(Elf32_Ehdr *header, FILE* file, Elf32_Shdr** sh_table){
-    fseek(file, header->e_shoff, SEEK_SET);
-    int res;
-    for(int i= 0; i < header->e_shnum; i++){
-        sh_table[i] = malloc(sizeof (Elf32_Shdr));
-        res = fread(sh_table[i],  header->e_shentsize, 1, file);
-        if(res <= 0){
-            error_report("[AVR32-BOOT] Cannot read firmware section table\n");
-            exit(1);
-        }
-        sh_table[i]->sh_offset = avr32_elf_convert_int(sh_table[i]->sh_offset);
-        sh_table[i]->sh_size = avr32_elf_convert_int(sh_table[i]->sh_size);
-        sh_table[i]->sh_name = avr32_elf_convert_int(sh_table[i]->sh_name);
-        sh_table[i]->sh_addr = avr32_elf_convert_int(sh_table[i]->sh_addr);
-    }
-}
-
-void avr32_elf_read_string_table(Elf32_Ehdr *header, FILE* file, Elf32_Shdr** sh_table, char *strtable) {
-    int offset = sh_table[header->e_shstrndx]->sh_offset;
-    int size = sh_table[header->e_shstrndx]->sh_size;
-
-    int res = 0;
-    fseek(file, offset, SEEK_SET);
-    res = fread(strtable, size, 1, file);
-
-    if(res <= 0){
-        printf("Read error!");
-        exit(1);
-    }
-}
+#include "target/avr32/helper_elf.h"
 
 void avr32_copy_text_section(int e_shnum, FILE* file, Elf32_Shdr** sh_table, char *strtable, FILE* output){
     int text_section_idx = -1;
@@ -220,20 +153,6 @@ bool avr32_load_elf_file(AVR32ACPU *cpu, char *filename, MemoryRegion *program_m
     }
     free(sh_table);
     return true;
-}
-
-static bool avr32_is_elf_file(char *filename){
-    FILE *firm_file = fopen(filename, "rb");
-    char magic[4];
-    int res = fread(&magic, 1, 4, firm_file);
-    fclose(firm_file);
-    if(!res){
-        error_report("[AVR32-BOOT] Cannot read firmware image header\n");
-        exit(1);
-    }
-
-    return (magic[0] == 0x7f && magic[1] == 0x45 && magic[2] == 0x4c && magic[3] == 0x46);
-
 }
 
 bool avr32_load_firmware(AVR32ACPU *cpu, MachineState *ms,
