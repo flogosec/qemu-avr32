@@ -166,6 +166,7 @@ typedef struct mips_elf_abiflags_v0 {
 #define EM_CRIS             76  /* Axis Communications 32-bit embedded processor */
 
 #define EM_AVR              83  /* AVR 8-bit microcontroller */
+#define EM_AVR32            185  /* Amtel 32-bit microprocessor (AVR32) */
 
 #define EM_V850             87  /* NEC v850 */
 
@@ -209,6 +210,7 @@ typedef struct mips_elf_abiflags_v0 {
 #define EM_AARCH64          183
 
 #define EF_AVR_MACH         0x7F /* Mask for AVR e_flags to get core type */
+#define EF_AVR32_MACH       0x0  /* Mask for AVR32 e_flags */
 
 /* This is the info that is needed to parse the dynamic section of the file */
 #define DT_NULL         0
