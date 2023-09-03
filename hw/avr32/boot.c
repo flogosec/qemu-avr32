@@ -28,10 +28,10 @@
 #include "exec/exec-all.h"
 #include "target/avr32/helper_elf.h"
 
-void avr32_copy_text_section(int e_shnum, FILE* file, Elf32_Shdr** sh_table, char *strtable, FILE* output){
+void avr32_copy_text_section(int e_shnum, FILE* file, Elf32_Shdr** sh_table, char *sh_strtable, FILE* output){
     int text_section_idx = -1;
     for(int i= 0; i< e_shnum; i++){
-        if(strcmp(&strtable[sh_table[i]->sh_name], ".text") == 0){
+        if(strcmp(&sh_strtable[sh_table[i]->sh_name], ".text") == 0){
             text_section_idx = i;
             break;
         }
@@ -52,10 +52,10 @@ void avr32_copy_text_section(int e_shnum, FILE* file, Elf32_Shdr** sh_table, cha
     free(buffer);
 }
 
-void avr32_copy_data_section(int e_shnum, FILE* file, Elf32_Shdr** sh_table, char *strtable, FILE* output){
+void avr32_copy_data_section(int e_shnum, FILE* file, Elf32_Shdr** sh_table, char *sh_strtable, FILE* output){
     int data_section_idx = -1;
     for(int i= 0; i< e_shnum; i++){
-        if(strcmp(&strtable[sh_table[i]->sh_name], ".data") == 0){
+        if(strcmp(&sh_strtable[sh_table[i]->sh_name], ".data") == 0){
             data_section_idx = i;
             break;
         }
@@ -86,10 +86,10 @@ void avr32_copy_data_section(int e_shnum, FILE* file, Elf32_Shdr** sh_table, cha
     free(buffer);
 }
 
-void avr32_copy_sections(int e_shnum, FILE* file, Elf32_Shdr** sh_table, char *strtable, MemoryRegion *program_mr){
+void avr32_copy_sections(int e_shnum, FILE* file, Elf32_Shdr** sh_table, char *sh_strtable, MemoryRegion *program_mr){
     FILE *output = fopen("/tmp/qemu_avr32_tmp_text_sec", "wb");
-    avr32_copy_text_section(e_shnum, file, sh_table, strtable, output);
-    avr32_copy_data_section(e_shnum, file, sh_table, strtable, output);
+    avr32_copy_text_section(e_shnum, file, sh_table, sh_strtable, output);
+    avr32_copy_data_section(e_shnum, file, sh_table, sh_strtable, output);
     fclose(output);
 
 
@@ -109,7 +109,7 @@ bool avr32_load_elf_file(AVR32ACPU *cpu, char *filename, MemoryRegion *program_m
 
     Elf32_Ehdr header;
     FILE* file = fopen(filename, "rb");
-    char *strtable = 0;
+    char *sh_strtable = 0;
     Elf32_Shdr** sh_table = 0;
     if(file) {
         // read the header
@@ -126,14 +126,10 @@ bool avr32_load_elf_file(AVR32ACPU *cpu, char *filename, MemoryRegion *program_m
                 sh_table = malloc(header.e_shnum * sizeof (Elf32_Shdr*));
 
                 avr32_elf_read_section_headers(&header, file, sh_table);
-                strtable = (char *)malloc(sh_table[header.e_shstrndx]->sh_size * sizeof(char));
+                sh_strtable = (char *)malloc(sh_table[header.e_shstrndx]->sh_size * sizeof(char));
 
-                avr32_elf_read_string_table(&header, file, sh_table, strtable);
-                /*for(int i= 0; i< header.e_shnum; i++){
-                    printf("Section[%i] size: 0x%x, name: %s\n", i, sh_table[i]->sh_size, &strtable[sh_table[i]->sh_name]);
-                }
-                */
-                avr32_copy_sections(header.e_shnum, file, sh_table, strtable, program_mr);
+                avr32_elf_read_sh_string_table(&header, file, sh_table, sh_strtable);
+                avr32_copy_sections(header.e_shnum, file, sh_table, sh_strtable, program_mr);
 
             }
             else{
@@ -147,7 +143,7 @@ bool avr32_load_elf_file(AVR32ACPU *cpu, char *filename, MemoryRegion *program_m
     }
 
     fclose(file);
-    free(strtable);
+    free(sh_strtable);
     for(int i= 0; i< header.e_shnum; i++){
         free(sh_table[i]);
     }
