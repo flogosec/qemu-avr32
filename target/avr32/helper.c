@@ -22,6 +22,7 @@
 #include "exec/exec-all.h"
 #include "tcg/tcg.h"
 #include "exec/helper-proto.h"
+#include "hw/avr32/boot.h"
 
 static inline void raise_exception(CPUAVR32AState *env, int index,
         uintptr_t retaddr);
