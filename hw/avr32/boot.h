@@ -23,6 +23,7 @@
 
 #include "hw/boards.h"
 #include "cpu.h"
+#include "elf.h"
 
 /**
  * avr32_load_firmware:   load an image into a memory region
@@ -39,5 +40,9 @@
  */
 bool avr32_load_firmware(AVR32ACPU *cpu, MachineState *ms,
                          MemoryRegion *mr, const char *firmware);
+bool avr32_load_elf_file(AVR32ACPU *cpu, char *filename, MemoryRegion *program_mr);
+void avr32_copy_sections(int e_shnum, FILE* file, Elf32_Shdr** sh_table, char *strtable, MemoryRegion *program_mr);
+void avr32_copy_text_section(int e_shnum, FILE* file, Elf32_Shdr** sh_table, char *strtable, FILE* output);
+void avr32_copy_data_section(int e_shnum, FILE* file, Elf32_Shdr** sh_table, char *strtable, FILE* output);
 
 #endif // HW_AVR32_BOOT_H
