@@ -24,7 +24,7 @@
 #include <string.h>
 #include "target/avr32/helper_elf.h"
 
-int avr32_elf_convert_int(int num){
+uint32_t avr32_elf_convert_int(uint32_t num){
     uint32_t b0,b1,b2,b3;
     b0 = (num & 0x000000ff) << 24u;
     b1 = (num & 0x0000ff00) << 8u;
@@ -56,7 +56,7 @@ void avr32_elf_read_section_headers(Elf32_Ehdr *header, FILE* file, Elf32_Shdr**
         sh_table[i] = malloc(sizeof (Elf32_Shdr));
         res = fread(sh_table[i],  header->e_shentsize, 1, file);
         if(res <= 0){
-            error_report("[AVR32-BOOT] Cannot read firmware section table\n");
+            error_report("[AVR32-ELF] Cannot read firmware section table\n");
             exit(1);
         }
         sh_table[i]->sh_offset = avr32_elf_convert_int(sh_table[i]->sh_offset);
@@ -66,16 +66,37 @@ void avr32_elf_read_section_headers(Elf32_Ehdr *header, FILE* file, Elf32_Shdr**
     }
 }
 
-void avr32_elf_read_string_table(Elf32_Ehdr *header, FILE* file, Elf32_Shdr** sh_table, char *strtable) {
+void avr32_elf_read_sh_string_table(Elf32_Ehdr *header, FILE* file, Elf32_Shdr** sh_table, char *sh_strtable) {
     int offset = sh_table[header->e_shstrndx]->sh_offset;
     int size = sh_table[header->e_shstrndx]->sh_size;
 
     int res = 0;
     fseek(file, offset, SEEK_SET);
+    res = fread(sh_strtable, size, 1, file);
+
+    if(res <= 0){
+        printf("[AVR32-ELF] Read error!");
+        exit(1);
+    }
+}
+
+void avr32_elf_read_string_table(Elf32_Ehdr *header, FILE* file, Elf32_Shdr** sh_table, char *sh_strtable, char* strtable) {
+    int strtab_idx = -1;
+    for(int i= 0; i< header->e_shnum; i++){
+        if(strcmp(&sh_strtable[sh_table[i]->sh_name], ".strtab") == 0){
+            strtab_idx = i;
+            break;
+        }
+    }
+    int offset = sh_table[strtab_idx]->sh_offset;
+    int size = sh_table[strtab_idx]->sh_size;
+
+    int res;
+    fseek(file, offset, SEEK_SET);
     res = fread(strtable, size, 1, file);
 
     if(res <= 0){
-        printf("Read error!");
+        printf("[AVR32-ELF] Read error!");
         exit(1);
     }
 }
@@ -86,10 +107,38 @@ bool avr32_is_elf_file(char *filename){
     int res = fread(&magic, 1, 4, firm_file);
     fclose(firm_file);
     if(!res){
-        error_report("[AVR32-BOOT] Cannot read firmware image header\n");
+        error_report("[AVR32-ELF] Cannot read firmware image header\n");
         exit(1);
     }
 
     return (magic[0] == 0x7f && magic[1] == 0x45 && magic[2] == 0x4c && magic[3] == 0x46);
+}
+
+void avr32_read_symtab(Elf32_Ehdr *header, FILE* file, Elf32_Shdr** sh_table, char *sh_strtable, char *strtab, Elf32_Sym** sym_tab){
+    int symtab_idx = -1;
+    for(int i= 0; i< header->e_shnum; i++){
+        if(strcmp(&sh_strtable[sh_table[i]->sh_name], ".symtab") == 0){
+            symtab_idx = i;
+            break;
+        }
+    }
+    int number_of_symbols = (sh_table[symtab_idx]->sh_size / sizeof (Elf32_Sym));
+    sym_tab = malloc(sh_table[symtab_idx]->sh_size);
+
+    fseek(file, sh_table[symtab_idx]->sh_offset, SEEK_SET);
+    int res;
+    for(int i= 0; i < number_of_symbols; i++){
+        sym_tab[i] = malloc(sizeof (Elf32_Sym));
+        res = fread(sym_tab[i],  sizeof (Elf32_Sym), 1, file);
+        if(res <= 0){
+            error_report("[AVR32-ELF] Cannot read symbol at index 0x%x\n", i);
+            exit(1);
+        }
+
+        sym_tab[i]->st_name = avr32_elf_convert_int(sym_tab[i]->st_name);
+        sym_tab[i]->st_value = avr32_elf_convert_int(sym_tab[i]->st_value);
+        sym_tab[i]->st_size = avr32_elf_convert_int(sym_tab[i]->st_size);
+        sym_tab[i]->st_shndx = avr32_elf_convert_int(sym_tab[i]->st_shndx);
+    }
 
 }
