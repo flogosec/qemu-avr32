@@ -258,34 +258,35 @@ INSN(MEMT_bp5_imm15,     MEMT,        "bp: 0x%02x, imm: [0x%04x]",     a->bp5, a
 
 INSN(MFSR,        MFSR,                "%s, SysReg: [0x%04x]",    REG(a->rd), (a->sr))
 
-INSN(MIN_rd_rx_ry,      MIN,       "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(MIN,           MIN,       "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
 
-INSN(MOV_rd_imm8,    MOV,     "%s, %d",                         REG(a->rd), a->imm8)
-INSN(MOV_cod_f1 ,    MOV,     "%s, %s, %d",                         REG(a->rd), REG(a->rs), a->cond4)
-INSN(MOV_rd_imm_cond4,    MOV,     "%s, %d, %d",                         REG(a->rd), a->imm8, a->cond4)
-INSN(MOV_rd_imm21,    MOV,     "%s, %d, %d, %d",                REG(a->rd), a->immu, a->immm, a->imml)
-INSN(MOV_rd_rs,    MOV,     "%s, %s",                           REG(a->rd), REG(a->rs))
+INSN(MOV_f1,    MOV,     "%s, %d",                                 REG(a->rd), a->imm8)
+INSN(MOV_f2,    MOV,     "%s, %d, %d, %d",                REG(a->rd), a->immu, a->immm, a->imml)
+INSN(MOV_f3,    MOV,     "%s, %s",                           REG(a->rd), REG(a->rs))
+INSN(MOVc_f1 ,    MOV,     "%s, %s, %d",                        REG(a->rd), REG(a->rs), a->cond4)
+INSN(MOVc_f2,    MOV,     "%s, %d, %d",                         REG(a->rd), a->imm8, a->cond4)
 
-INSN(MOVH_rd_imm16,    MOVH,     "%s, 0x%04x",                  REG(a->rd), a->imm16)
+INSN(MOVH,    MOVH,     "%s, 0x%04x",                           REG(a->rd), a->imm16)
 INSN(MTDR,    MTDR,     "%s, 0x%04x",                           REG(a->rs), a->addr)
 
-INSN(MTSR_rs_sr,    MTSR,     "%s, %s",                         REG(a->sr), REG(a->rs))
+INSN(MTSR,    MTSR,     "%s, %s",                         REG(a->sr), REG(a->rs))
 
-INSN(MUL_rd_rs,   MUL,        "%s, %s",                         REG(a->rs), REG(a->rd))
-INSN(MUL_rd_rx_ry, MUL,       "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
-INSN(MUL_rd_rs_imm8, MUL,       "%s, %s, 0x%04x",               REG(a->rd), REG(a->rs), a->imm8)
+INSN(MUL_f1,   MUL,        "%s, %s",                         REG(a->rs), REG(a->rd))
+INSN(MUL_f2, MUL,       "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(MUL_f3, MUL,       "%s, %s, 0x%04x",               REG(a->rd), REG(a->rs), a->imm8)
 INSN(MULHHW, MULHHW,       "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
 INSN(MULUD, MUL,       "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
 
-INSN(MUSFR_rs,   MUSFR,        "%s",                            REG(a->rs))
-INSN(MUSTR_rd,   MUSTR,        "%s",                            REG(a->rd))
+INSN(MUSFR,      MUSFR,        "%s",                            REG(a->rs))
+INSN(MUSTR,      MUSTR,        "%s",                            REG(a->rd))
 
-INSN(NEG_rd,   NEG,        "%s",                                REG(a->rd))
+INSN(NEG,   NEG,        "%s",                                REG(a->rd))
 INSN(NOP,   NOP,        "NOP: %d",                                12)
 
-INSN(OR_rs_rd,   OR,        "%s, %s",                           REG(a->rs), REG(a->rd))
+INSN(OR_f1,   OR,           "%s, %s",                           REG(a->rs), REG(a->rd))
 INSN(OR_f2,   OR,           "%s, %s, %s, 0x%04x",               REG(a->rd), REG(a->rx),REG(a->ry), a->sa5)
 INSN(OR_f3,   OR,           "%s, %s, %s, 0x%04x",               REG(a->rd), REG(a->rx),REG(a->ry), a->sa5)
+INSN(OR_cond, OR,           "%s, %s, %s, 0x%x",                 REG(a->rd), REG(a->rx),REG(a->ry), a->cond4)
 INSN(ORH,   ORH,        "%s, 0x%04x",                           REG(a->rd), a->imm16)
 INSN(ORL,   ORL,        "%s, 0x%04x",                           REG(a->rd), a->imm16)
 
@@ -293,7 +294,8 @@ INSN(ORL,   ORL,        "%s, 0x%04x",                           REG(a->rd), a->i
 INSN(POPM,   POPM,        "0x%04x",                           a->list)
 INSN(PUSHM,   PUSHM,        "0x%04x",                           a->list)
 
-INSN(RCALL_disp10,    RCALL,     "0x%04x, 0x%02x",              a->disp8, a->disp2)
+INSN(RCALL_f1,    RCALL,     "0x%04x, 0x%02x",                  a->disp8, a->disp2)
+INSN(RCALL_f2,    RCALL,     "0x%04x, 0x%02x, 0x%02x",          a->immu, a->immm, a->imml)
 
 INSN(RET,   RET,        "%s, %d",                               REG(a->rd), a->cond4)
 INSN(RETE,   RETE,        "RETE")
@@ -301,11 +303,11 @@ INSN(RETS,   RETS,        "RETS")
 
 INSN(RJMP,    RJMP,     "0x%04x, 0x%02x",                       a->disp8, a->disp2)
 
-INSN(ROL_rd,   ROL,        "%s",                                REG(a->rd))
-INSN(ROR_rd,   ROR,        "%s",                                REG(a->rd))
+INSN(ROL,   ROL,        "%s",                                REG(a->rd))
+INSN(ROR,   ROR,        "%s",                                REG(a->rd))
 
 INSN(RSUB_f1,   RSUB,        "%s, %s",                          REG(a->rd), REG(a->rs))
-INSN(RSUB_rd_rs_imm8,   RSUB,        "%s, %s, 0x%04x",          REG(a->rd), REG(a->rs), a->imm8)
+INSN(RSUB_f2,   RSUB,        "%s, %s, 0x%04x",          REG(a->rd), REG(a->rs), a->imm8)
 INSN(RSUBc,   RSUBc,        "%s, %d",                          REG(a->rd), a->imm8)
 
 INSN(SATU,   SATU,       "%s, bp5: 0x%04x, sa5: 0x%02x",         REG(a->rd), a->bp5, a->sa5)
@@ -322,15 +324,16 @@ INSN(SR,   SR,        "%s, cond4: 0x%04x",                      REG(a->rd), a->c
 
 INSN(SSRF,   SR,        "bp5: 0x%04x",                          a->bp5)
 
-INSN(STB_rp_rs,         STB,         "%s, %s",                  REG(a->rp), REG(a->rs))
+INSN(STB_f1,         STB,         "%s, %s",                  REG(a->rp), REG(a->rs))
 INSN(STB_f2,            STB,         "%s, %s",                  REG(a->rp), REG(a->rs))
 INSN(STB_f3,            STB,         "%s, %s, 0x%02x",          REG(a->rp), REG(a->rd), a->disp3)
 INSN(STB_f4,            STB,         "%s, %s, 0x%04x",          REG(a->rp), REG(a->rs), a->imm16)
 INSN(STB_f5,            STB,         "%s, %s, %s, 0x%02x",      REG(a->rd), REG(a->rx), REG(a->ry), a->sa)
 INSN(STBc,              STB,         "%s, %s",                  REG(a->rp), REG(a->rd))
-INSN(STD_rs_rp,         STD,         "%s, %s",                  REG(a->rp), REG(a->rs))
+INSN(STD_f1,            STD,         "%s, %s",                  REG(a->rp), REG(a->rs))
 INSN(STD_f2,            STD,         "%s, %s",                  REG(a->rp), REG(a->rs))
-INSN(STD_rp_rs_disp,  STD,          "%s, %s, 0x%04x",           REG(a->rp), REG(a->rs), a->disp16)
+INSN(STD_f3,            STD,         "%s, %s",                  REG(a->rp), REG(a->rs))
+INSN(STD_f4,            STD,          "%s, %s, 0x%04x",           REG(a->rp), REG(a->rs), a->disp16)
 INSN(STDSP,  STD,                   "%s, 0x%04x",               REG(a->rd), a->disp)
 
 INSN(STH_f1,   STH,                "%s, %s",                        REG(a->rp), REG(a->rs))
