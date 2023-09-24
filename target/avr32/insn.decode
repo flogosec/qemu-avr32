@@ -369,16 +369,17 @@ SR              010 11111 .... ....                         @op_rd_cond4
 
 SSRF            1101001 ..... 0011                          @op_bp5
 
-STB_f1       000 .... 01100 ....                         @op_rp_rs
+STB_f1          000 .... 01100 ....                         @op_rp_rs
 STB_f2          000 .... 01111 ....                         @op_rp_rs
 STB_f3          101 .... 01 ... ....                        @op_rd_rp_disp3
 STB_f4          111 .... 10110 .... ................        @op_rp_rs_imm16
 STB_f5          111 .... 00000 .... 0000 1011 00 .. ....    @op_rd_rx_ry_sa
 STBc            111 .... 11111 .... .... 111 .........      @op_rd_rp_cond4_disp9
 
-STD_rs_rp       101 .... 100 10 ... 0                       @op_rp_rs3
+STD_f1          101 .... 100 10 ... 0                       @op_rp_rs3
 STD_f2          101 .... 100 10 ... 1                       @op_rp_rs3
-STD_rp_rs_disp  111 .... 01110 ... 1 ................       @op_rp_rs_disp16
+STD_f3          101 .... 100 01 ... 1                       @op_rp_rs3
+STD_f4          111 .... 01110 ... 1 ................       @op_rp_rs_disp16
 STDSP           010 10 ....... ....                         @op_rd_disp
 
 STH_f1          000 .... 01011 ....                         @op_rp_rs

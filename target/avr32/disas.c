@@ -330,9 +330,10 @@ INSN(STB_f3,            STB,         "%s, %s, 0x%02x",          REG(a->rp), REG(
 INSN(STB_f4,            STB,         "%s, %s, 0x%04x",          REG(a->rp), REG(a->rs), a->imm16)
 INSN(STB_f5,            STB,         "%s, %s, %s, 0x%02x",      REG(a->rd), REG(a->rx), REG(a->ry), a->sa)
 INSN(STBc,              STB,         "%s, %s",                  REG(a->rp), REG(a->rd))
-INSN(STD_rs_rp,         STD,         "%s, %s",                  REG(a->rp), REG(a->rs))
+INSN(STD_f1,            STD,         "%s, %s",                  REG(a->rp), REG(a->rs))
 INSN(STD_f2,            STD,         "%s, %s",                  REG(a->rp), REG(a->rs))
-INSN(STD_rp_rs_disp,  STD,          "%s, %s, 0x%04x",           REG(a->rp), REG(a->rs), a->disp16)
+INSN(STD_f3,            STD,         "%s, %s",                  REG(a->rp), REG(a->rs))
+INSN(STD_f4,            STD,          "%s, %s, 0x%04x",           REG(a->rp), REG(a->rs), a->disp16)
 INSN(STDSP,  STD,                   "%s, 0x%04x",               REG(a->rd), a->disp)
 
 INSN(STH_f1,   STH,                "%s, %s",                        REG(a->rp), REG(a->rs))

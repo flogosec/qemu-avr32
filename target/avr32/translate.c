@@ -3492,7 +3492,7 @@ static bool trans_STBc(DisasContext *ctx, arg_STBc *a){
     return true;
 }
 
-static bool trans_STD_rs_rp(DisasContext *ctx, arg_STD_rs_rp *a){
+static bool trans_STD_f1(DisasContext *ctx, arg_STD_f1 *a){
     TCGv ptr = cpu_r[a->rp];
     TCGv rs = cpu_r[a->rs*2];
     TCGv rsp = cpu_r[a->rs*2 + 1];
@@ -3521,7 +3521,24 @@ static bool trans_STD_f2(DisasContext *ctx, arg_STD_f2 *a){
     return true;
 }
 
-static bool trans_STD_rp_rs_disp(DisasContext *ctx, arg_STD_rp_rs_disp *a){
+//TODO: add tests
+static bool trans_STD_f3(DisasContext *ctx, arg_STD_f3 *a){
+    TCGv ptr = tcg_temp_new_i32();
+    TCGv rs = cpu_r[a->rs*2];
+    TCGv rsp = cpu_r[a->rs*2 + 1];
+
+    tcg_gen_mov_i32(ptr, cpu_r[a->rp]);
+
+    tcg_gen_qemu_st_tl(rsp, ptr, 0x0, MO_BEUL);
+    tcg_gen_addi_tl(ptr, ptr, 4);
+    tcg_gen_qemu_st_i32(rs, ptr, 0x0, MO_BEUL);
+    tcg_gen_addi_i32(ptr, ptr, 4);
+
+    ctx->base.pc_next += 4;
+    return true;
+}
+
+static bool trans_STD_f4(DisasContext *ctx, arg_STD_f4 *a){
     TCGv ptr = tcg_temp_new_i32();
     TCGv disp = tcg_temp_new_i32();
     TCGv rs = cpu_r[a->rs*2];
@@ -3541,7 +3558,6 @@ static bool trans_STD_rp_rs_disp(DisasContext *ctx, arg_STD_rp_rs_disp *a){
     tcg_gen_addi_tl(ptr, ptr, 4);
     tcg_gen_qemu_st_i32(rs, ptr, 0x0, MO_BEUL);
     tcg_gen_addi_i32(ptr, ptr, 4);
-
 
     ctx->base.pc_next += 4;
     return true;
