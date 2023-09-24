@@ -3418,7 +3418,7 @@ static bool trans_SSRF(DisasContext *ctx, arg_SSRF *a){
     return true;
 }
 
-static bool trans_STB_rp_rs(DisasContext *ctx, arg_STB_rp_rs *a){
+static bool trans_STB_f1(DisasContext *ctx, arg_STB_f1 *a){
     TCGv ptr = cpu_r[a->rp];
     TCGv rs = cpu_r[a->rs];
     tcg_gen_qemu_st_tl(rs, ptr, 0, MO_UB);

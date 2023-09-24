@@ -324,7 +324,7 @@ INSN(SR,   SR,        "%s, cond4: 0x%04x",                      REG(a->rd), a->c
 
 INSN(SSRF,   SR,        "bp5: 0x%04x",                          a->bp5)
 
-INSN(STB_rp_rs,         STB,         "%s, %s",                  REG(a->rp), REG(a->rs))
+INSN(STB_f1,         STB,         "%s, %s",                  REG(a->rp), REG(a->rs))
 INSN(STB_f2,            STB,         "%s, %s",                  REG(a->rp), REG(a->rs))
 INSN(STB_f3,            STB,         "%s, %s, 0x%02x",          REG(a->rp), REG(a->rd), a->disp3)
 INSN(STB_f4,            STB,         "%s, %s, 0x%04x",          REG(a->rp), REG(a->rs), a->imm16)
