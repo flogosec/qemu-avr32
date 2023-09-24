@@ -2079,7 +2079,7 @@ static bool trans_LSR_f3(DisasContext *ctx, arg_LSR_f3 *a)
 }
 
 
-static bool trans_MAC_rd_rx_ry(DisasContext *ctx, arg_MAC_rd_rx_ry *a)
+static bool trans_MAC(DisasContext *ctx, arg_MAC_rd_rx_ry *a)
 {
     TCGv temp = tcg_temp_new_i32();
     tcg_gen_mul_i32(temp, cpu_r[a->rx],cpu_r[a->ry]);
@@ -2169,9 +2169,32 @@ static bool trans_MACHHW(DisasContext *ctx, arg_MACHHW *a)
     return true;
 }
 
-// TODO: next insn MACS.D
+//TODO: add tests
+static bool trans_MACSD(DisasContext *ctx, arg_MACUd *a){
+    TCGv_i64 rdp = tcg_temp_new_i64();
+    TCGv_i64 rd = tcg_temp_new_i64();
+    TCGv_i64 acc = tcg_temp_new_i64();
+    TCGv_i64 prod64 = tcg_temp_new_i64();
+    TCGv_i64 res = tcg_temp_new_i64();
+    TCGv_i64 rx = tcg_temp_new_i64();
+    TCGv_i64 ry = tcg_temp_new_i64();
+    tcg_gen_ext_i32_i64(rdp, cpu_r[a->rd+1]);
+    tcg_gen_ext_i32_i64(rd, cpu_r[a->rd]);
+    tcg_gen_ext_i32_i64(rx, cpu_r[a->rx]);
+    tcg_gen_ext_i32_i64(ry, cpu_r[a->ry]);
+    tcg_gen_shli_i64(acc, rdp, 32);
+    tcg_gen_add_i64(acc, acc, rd);
 
-static bool trans_MACUd(DisasContext *ctx, arg_MACUd *a){
+    tcg_gen_mul_i64(prod64, rx, ry);
+
+    tcg_gen_add_i64(res, prod64, acc);
+    tcg_gen_extr_i64_i32(cpu_r[a->rd], cpu_r[a->rd+1], res);
+
+    ctx->base.pc_next += 4;
+    return true;
+}
+
+static bool trans_MACUD(DisasContext *ctx, arg_MACUd *a){
     TCGv_i64 rdp = tcg_temp_new_i64();
     TCGv_i64 rd = tcg_temp_new_i64();
     TCGv_i64 acc = tcg_temp_new_i64();
@@ -2186,7 +2209,6 @@ static bool trans_MACUd(DisasContext *ctx, arg_MACUd *a){
     tcg_gen_shli_i64(acc, rdp, 32);
     tcg_gen_add_i64(acc, acc, rd);
 
-
     tcg_gen_mul_i64(prod64, rx, ry);
 
     tcg_gen_add_i64(res, prod64, acc);
@@ -2194,11 +2216,6 @@ static bool trans_MACUd(DisasContext *ctx, arg_MACUd *a){
 
     ctx->base.pc_next += 4;
     return true;
-}
-
-static bool trans_MACSD_rd_rx_ry(DisasContext *ctx, arg_MACSD_rd_rx_ry *a)
-{
-    return false;
 }
 
 static bool trans_MAX_rd_rx_ry(DisasContext *ctx, arg_MAX_rd_rx_ry *a)
