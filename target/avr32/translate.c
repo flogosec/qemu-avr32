@@ -2194,6 +2194,8 @@ static bool trans_MACSD(DisasContext *ctx, arg_MACUd *a){
     return true;
 }
 
+//TODO implement MACSATHH.W insn
+
 static bool trans_MACUD(DisasContext *ctx, arg_MACUd *a){
     TCGv_i64 rdp = tcg_temp_new_i64();
     TCGv_i64 rd = tcg_temp_new_i64();
@@ -2218,7 +2220,9 @@ static bool trans_MACUD(DisasContext *ctx, arg_MACUd *a){
     return true;
 }
 
-static bool trans_MAX_rd_rx_ry(DisasContext *ctx, arg_MAX_rd_rx_ry *a)
+//TODO: implement MACWH.D insn
+
+static bool trans_MAX(DisasContext *ctx, arg_MAX_rd_rx_ry *a)
 {
 
     TCGLabel *if_1 = gen_new_label();
@@ -2241,7 +2245,7 @@ static bool trans_MAX_rd_rx_ry(DisasContext *ctx, arg_MAX_rd_rx_ry *a)
     return true;
 }
 
-static bool trans_MCALL_rp_disp(DisasContext *ctx, arg_MCALL_rp_disp *a)
+static bool trans_MCALL(DisasContext *ctx, arg_MCALL_rp_disp *a)
 {
     tcg_gen_addi_i32(cpu_r[LR_REG], cpu_r[PC_REG], 0x4);
     TCGv PC = cpu_r[PC_REG];
