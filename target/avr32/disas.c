@@ -242,19 +242,17 @@ INSN(LSR_f1,    LSL,       "%s, %s, %s",                  REG(a->rd), REG(a->rx)
 INSN(LSR_f2,          LSL,       "%s, %0x2x, %0x2x",            REG(a->rd), a->bp4, a->bp1)
 INSN(LSR_f3,    LSL,       "%s, %s, 0x%04x",                  REG(a->rd), REG(a->rs), a->sa5)
 
-INSN(MACHHD,    MACHHD,       "%s, %s, %s",                  REG(a->rd), REG(a->rx), REG(a->ry))
-INSN(MACHHW,    MACHHW,       "%s, %s, %s",                  REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(MAC,               MAC,       "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(MACHHD,            MACHHD,       "%s, %s, %s",                  REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(MACHHW,            MACHHW,       "%s, %s, %s",                  REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(MACSD,             MACSD,     "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(MACUD,             MACUd,     "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
 
+INSN(MAX,                MAX,       "%s, %s, %s",                  REG(a->rd), REG(a->rx), REG(a->ry))
 
-INSN(MAC_rd_rx_ry,    MAC,       "%s, %s, %s",                  REG(a->rd), REG(a->rx), REG(a->ry))
-INSN(MACUd,           MACUd,     "%s, %s, %s",                  REG(a->rd), REG(a->rx), REG(a->ry))
-INSN(MACSD_rd_rx_ry,    MACSD,       "%s, %s, %s",              REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(MCALL,              MCALL,        "%s, disp: [0x%04x]",     REG(a->rp), (a->disp))
 
-INSN(MAX_rd_rx_ry,    MAX,       "%s, %s, %s",                  REG(a->rd), REG(a->rx), REG(a->ry))
-
-INSN(MCALL_rp_disp,     MCALL,        "%s, disp: [0x%04x]",     REG(a->rp), (a->disp))
-
-INSN(MEMC_bp5_imm15,     MEMC,        "bp: 0x%02x, imm: [0x%04x]",     a->bp5, a->imm15)
+INSN(MEMC,               MEMC,        "bp: 0x%02x, imm: [0x%04x]",     a->bp5, a->imm15)
 INSN(MEMS_bp5_imm15,     MEMS,        "bp: 0x%02x, imm: [0x%04x]",     a->bp5, a->imm15)
 INSN(MEMT_bp5_imm15,     MEMT,        "bp: 0x%02x, imm: [0x%04x]",     a->bp5, a->imm15)
 
