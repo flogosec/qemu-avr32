@@ -2567,7 +2567,7 @@ static bool trans_MUSTR(DisasContext *ctx, arg_MUSTR *a){
     return true;
 }
 
-static bool trans_NEG_rd(DisasContext *ctx, arg_NEG_rd *a){
+static bool trans_NEG(DisasContext *ctx, arg_NEG *a){
 
     TCGv zero = tcg_temp_new_i32();
     TCGv rd = tcg_temp_new_i32();
@@ -2596,7 +2596,7 @@ static bool trans_NOP(DisasContext *ctx, arg_NOP *a){
 }
 
 
-static bool trans_OR_rs_rd(DisasContext *ctx, arg_OR_rs_rd *a){
+static bool trans_OR_f1(DisasContext *ctx, arg_OR_f1 *a){
     tcg_gen_or_i32(cpu_r[a->rd], cpu_r[a->rd], cpu_r[a->rs]);
     TCGv res = tcg_temp_new_i32();
     tcg_gen_mov_i32(res, cpu_r[a->rd]);
@@ -2633,6 +2633,21 @@ static bool trans_OR_f3(DisasContext *ctx, arg_OR_f2 *a){
     tcg_gen_setcondi_i32(TCG_COND_EQ, cpu_sflags[sflagZ], res, 0);
     tcg_gen_shri_i32(cpu_sflags[sflagN], res, 31);
 
+    ctx->base.pc_next += 4;
+    return true;
+}
+
+static bool trans_OR_cond(DisasContext *ctx, arg_OR_cond *a){
+    TCGLabel *no_op = gen_new_label();
+
+    TCGv reg = tcg_temp_new_i32();
+    int val = checkCondition(a->cond4, reg, cpu_r, cpu_sflags);
+
+    tcg_gen_brcondi_i32(TCG_COND_NE, reg, val, no_op);
+
+    tcg_gen_or_i32(cpu_r[a->rd], cpu_r[a->rx], cpu_r[a->ry]);
+
+    gen_set_label(no_op);
     ctx->base.pc_next += 4;
     return true;
 }

@@ -280,12 +280,13 @@ INSN(MULUD, MUL,       "%s, %s, %s",                     REG(a->rd), REG(a->rx),
 INSN(MUSFR,      MUSFR,        "%s",                            REG(a->rs))
 INSN(MUSTR,      MUSTR,        "%s",                            REG(a->rd))
 
-INSN(NEG_rd,   NEG,        "%s",                                REG(a->rd))
+INSN(NEG,   NEG,        "%s",                                REG(a->rd))
 INSN(NOP,   NOP,        "NOP: %d",                                12)
 
-INSN(OR_rs_rd,   OR,        "%s, %s",                           REG(a->rs), REG(a->rd))
+INSN(OR_f1,   OR,           "%s, %s",                           REG(a->rs), REG(a->rd))
 INSN(OR_f2,   OR,           "%s, %s, %s, 0x%04x",               REG(a->rd), REG(a->rx),REG(a->ry), a->sa5)
 INSN(OR_f3,   OR,           "%s, %s, %s, 0x%04x",               REG(a->rd), REG(a->rx),REG(a->ry), a->sa5)
+INSN(OR_cond, OR,           "%s, %s, %s, 0x%x",                 REG(a->rd), REG(a->rx),REG(a->ry), a->cond4)
 INSN(ORH,   ORH,        "%s, 0x%04x",                           REG(a->rd), a->imm16)
 INSN(ORL,   ORL,        "%s, 0x%04x",                           REG(a->rd), a->imm16)
 
