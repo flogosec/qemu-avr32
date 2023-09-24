@@ -302,17 +302,18 @@ MEMT_bp5_imm15  111 110100001 ..... ...............         @op_bp5_imm15
 MFSR            111 000011011 .... 00000000 ........        @op_rd_sr
 
 # TODO: verify, instruction set reference contains error in opcode
-MIN_rd_rx_ry    111 .... 00000 .... 0000 11010100 ....      @op_rd_rx_ry
+MIN             111 .... 00000 .... 0000 11010100 ....      @op_rd_rx_ry
 
-MOV_rd_imm8     001 1 ........ ....                         @op_rd_imm8
-MOV_rd_imm21    111 .... 0011 . .... ................       @op_rd_imm21
-MOV_rd_rs       000 .... 01001 ....                         @op_rs_rd
-MOV_rd_imm_cond4  111 1100 11011 .... 0000 .... ........    @op_rd_cond4_imm8
-MOV_cod_f1      111 .... 00000 .... 0001 0111 .... 0000     @op_rd_rs_cond4
+MOV_f1     001 1 ........ ....                         @op_rd_imm8
+MOV_f2    111 .... 0011 . .... ................       @op_rd_imm21
+MOV_f3       000 .... 01001 ....                         @op_rs_rd
+MOVc_f1      111 .... 00000 .... 0001 0111 .... 0000     @op_rd_rs_cond4
+MOVc_f2  111 1100 11011 .... 0000 .... ........    @op_rd_cond4_imm8
 
-MOVH_rd_imm16   111 111000001 .... ................         @op_rd_imm16
+
+MOVH            111 111000001 .... ................         @op_rd_imm16
 MTDR            111 001111011 .... 00000000 ........        @op_mtdr
-MTSR_rs_sr      111 000111011 .... 00000000 ........        @op_rs_sr
+MTSR            111 000111011 .... 00000000 ........        @op_rs_sr
 
 MUL_rd_rs       101 .... 10011 ....                         @op_rs_rd
 MUL_rd_rx_ry    111 .... 00000 .... 0000 00100100 ....      @op_rd_rx_ry

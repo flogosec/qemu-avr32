@@ -258,18 +258,18 @@ INSN(MEMT_bp5_imm15,     MEMT,        "bp: 0x%02x, imm: [0x%04x]",     a->bp5, a
 
 INSN(MFSR,        MFSR,                "%s, SysReg: [0x%04x]",    REG(a->rd), (a->sr))
 
-INSN(MIN_rd_rx_ry,      MIN,       "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(MIN,           MIN,       "%s, %s, %s",                REG(a->rd), REG(a->rx), REG(a->ry))
 
-INSN(MOV_rd_imm8,    MOV,     "%s, %d",                         REG(a->rd), a->imm8)
-INSN(MOV_cod_f1 ,    MOV,     "%s, %s, %d",                         REG(a->rd), REG(a->rs), a->cond4)
-INSN(MOV_rd_imm_cond4,    MOV,     "%s, %d, %d",                         REG(a->rd), a->imm8, a->cond4)
-INSN(MOV_rd_imm21,    MOV,     "%s, %d, %d, %d",                REG(a->rd), a->immu, a->immm, a->imml)
-INSN(MOV_rd_rs,    MOV,     "%s, %s",                           REG(a->rd), REG(a->rs))
+INSN(MOV_f1,    MOV,     "%s, %d",                                 REG(a->rd), a->imm8)
+INSN(MOV_f2,    MOV,     "%s, %d, %d, %d",                REG(a->rd), a->immu, a->immm, a->imml)
+INSN(MOV_f3,    MOV,     "%s, %s",                           REG(a->rd), REG(a->rs))
+INSN(MOVc_f1 ,    MOV,     "%s, %s, %d",                        REG(a->rd), REG(a->rs), a->cond4)
+INSN(MOVc_f2,    MOV,     "%s, %d, %d",                         REG(a->rd), a->imm8, a->cond4)
 
-INSN(MOVH_rd_imm16,    MOVH,     "%s, 0x%04x",                  REG(a->rd), a->imm16)
+INSN(MOVH,    MOVH,     "%s, 0x%04x",                           REG(a->rd), a->imm16)
 INSN(MTDR,    MTDR,     "%s, 0x%04x",                           REG(a->rs), a->addr)
 
-INSN(MTSR_rs_sr,    MTSR,     "%s, %s",                         REG(a->sr), REG(a->rs))
+INSN(MTSR,    MTSR,     "%s, %s",                         REG(a->sr), REG(a->rs))
 
 INSN(MUL_rd_rs,   MUL,        "%s, %s",                         REG(a->rs), REG(a->rd))
 INSN(MUL_rd_rx_ry, MUL,       "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
