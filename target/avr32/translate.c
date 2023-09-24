@@ -3563,21 +3563,7 @@ static bool trans_STD_f4(DisasContext *ctx, arg_STD_f4 *a){
     return true;
 }
 
-static bool trans_STDSP(DisasContext *ctx, arg_STDSP *a){
-    TCGv ptr = tcg_temp_new_i32();
-    tcg_gen_mov_i32(ptr, cpu_r[SP_REG]);
-    tcg_gen_andi_i32(ptr, ptr, 0xFFFFFFFC);
-
-    TCGv disp = tcg_temp_new_i32();
-    tcg_gen_movi_i32(disp, a->disp<<2);
-
-    tcg_gen_add_i32(ptr, ptr, disp);
-
-    tcg_gen_qemu_st_i32(cpu_r[a->rd], ptr, 0x0, MO_BEUL);
-
-    ctx->base.pc_next += 2;
-    return true;
-}
+//TODO: Add STD format 5.
 
 static bool trans_STH_f1(DisasContext *ctx, arg_STH_f1 *a){
     tcg_gen_qemu_st_tl(cpu_r[a->rs], cpu_r[a->rp], 0x0, MO_BEUW);
@@ -3651,6 +3637,23 @@ static bool trans_STHc(DisasContext *ctx, arg_STHc *a){
     return true;
 }
 
+//TODO: Add STCOND
+
+static bool trans_STDSP(DisasContext *ctx, arg_STDSP *a){
+    TCGv ptr = tcg_temp_new_i32();
+    tcg_gen_mov_i32(ptr, cpu_r[SP_REG]);
+    tcg_gen_andi_i32(ptr, ptr, 0xFFFFFFFC);
+
+    TCGv disp = tcg_temp_new_i32();
+    tcg_gen_movi_i32(disp, a->disp<<2);
+
+    tcg_gen_add_i32(ptr, ptr, disp);
+
+    tcg_gen_qemu_st_i32(cpu_r[a->rd], ptr, 0x0, MO_BEUL);
+
+    ctx->base.pc_next += 2;
+    return true;
+}
 
 static bool trans_STM(DisasContext *ctx, arg_STM *a){
     int regFlag = 0;
@@ -3695,6 +3698,8 @@ static bool trans_STW_f2(DisasContext *ctx, arg_STW_f2 *a){
     ctx->base.pc_next += 2;
     return true;
 }
+
+//TODO: Continue renaming here
 
 static bool trans_STW_rp_rs_disp4(DisasContext *ctx, arg_STW_rp_rs_disp4 *a){
     //stw_f3
