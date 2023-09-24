@@ -2469,20 +2469,20 @@ static bool trans_MTSR (DisasContext *ctx, arg_MTSR  *a)
     return true;
 }
 
-static bool trans_MUL_rd_rs(DisasContext *ctx, arg_MUL_rd_rs *a){
+static bool trans_MUL_f1(DisasContext *ctx, arg_MUL_f1 *a){
     tcg_gen_mul_i32(cpu_r[a->rd], cpu_r[a->rd], cpu_r[a->rs]);
 
     ctx->base.pc_next += 2;
     return true;
 }
 
-static bool trans_MUL_rd_rx_ry(DisasContext *ctx, arg_MUL_rd_rx_ry *a){
+static bool trans_MUL_f2(DisasContext *ctx, arg_MUL_f2 *a){
     tcg_gen_mul_i32(cpu_r[a->rd], cpu_r[a->rx], cpu_r[a->ry]);
     ctx->base.pc_next +=4;
     return true;
 }
 
-static bool trans_MUL_rd_rs_imm8(DisasContext *ctx, arg_MUL_rd_rs_imm8 *a){
+static bool trans_MUL_f3(DisasContext *ctx, arg_MUL_f3 *a){
     int imm = sign_extend_8(a->imm8);
     tcg_gen_muli_i32(cpu_r[a->rd], cpu_r[a->rs], imm);
     ctx->base.pc_next +=4;

@@ -271,9 +271,9 @@ INSN(MTDR,    MTDR,     "%s, 0x%04x",                           REG(a->rs), a->a
 
 INSN(MTSR,    MTSR,     "%s, %s",                         REG(a->sr), REG(a->rs))
 
-INSN(MUL_rd_rs,   MUL,        "%s, %s",                         REG(a->rs), REG(a->rd))
-INSN(MUL_rd_rx_ry, MUL,       "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
-INSN(MUL_rd_rs_imm8, MUL,       "%s, %s, 0x%04x",               REG(a->rd), REG(a->rs), a->imm8)
+INSN(MUL_f1,   MUL,        "%s, %s",                         REG(a->rs), REG(a->rd))
+INSN(MUL_f2, MUL,       "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(MUL_f3, MUL,       "%s, %s, 0x%04x",               REG(a->rd), REG(a->rs), a->imm8)
 INSN(MULHHW, MULHHW,       "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
 INSN(MULUD, MUL,       "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
 
