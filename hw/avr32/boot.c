@@ -104,7 +104,7 @@ void avr32_copy_sections(int e_shnum, FILE* file, Elf32_Shdr** sh_table, char *s
     printf("[AVR32-BOOT] Removed temp firmware file\n");
 }
 
-bool avr32_load_elf_file(AVR32ACPU *cpu, char *filename, MemoryRegion *program_mr){
+bool avr32_load_elf_file(AVR32ACPU *cpu, const char *filename, MemoryRegion *program_mr){
     printf("[AVR32-BOOT] Loading firmware images as ELF file\n");
 
     Elf32_Ehdr header;
@@ -154,20 +154,19 @@ bool avr32_load_elf_file(AVR32ACPU *cpu, char *filename, MemoryRegion *program_m
 bool avr32_load_firmware(AVR32ACPU *cpu, MachineState *ms,
                          MemoryRegion *program_mr, const char *firmware)
 {
-    g_autofree char *filename = NULL;
-    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
-    if (filename == NULL) {
+    AVR32_FIRMWARE_FILE = qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
+    if (AVR32_FIRMWARE_FILE == NULL) {
         error_report("[AVR32-BOOT] Cannot find firmware image '%s'", firmware);
         return false;
     }
 
-    if(avr32_is_elf_file(filename)){
+    if(avr32_is_elf_file(AVR32_FIRMWARE_FILE)){
         //TODO: For some reason QEMU internal ELF-loaders fail to load an AVR32 Elf file. For now we use a custom elf-loader to extract the .text section from an elf-file.
-        avr32_load_elf_file(cpu, filename, program_mr);
+        avr32_load_elf_file(cpu, AVR32_FIRMWARE_FILE, program_mr);
     }
     else{
         printf("[AVR32-BOOT]: Loading firmware images as raw binary\n");
-        int bytes_loaded = load_image_mr(filename, program_mr);
+        int bytes_loaded = load_image_mr(AVR32_FIRMWARE_FILE, program_mr);
         if (bytes_loaded < 0) {
             error_report("[AVR32-BOOT] Unable to load firmware image %s as raw binary",
                          firmware);

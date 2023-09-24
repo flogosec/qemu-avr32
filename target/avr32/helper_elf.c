@@ -24,6 +24,8 @@
 #include <string.h>
 #include "target/avr32/helper_elf.h"
 
+const char *AVR32_FIRMWARE_FILE;
+
 uint32_t avr32_elf_convert_int(uint32_t num){
     uint32_t b0,b1,b2,b3;
     b0 = (num & 0x000000ff) << 24u;
@@ -101,7 +103,7 @@ void avr32_elf_read_string_table(Elf32_Ehdr *header, FILE* file, Elf32_Shdr** sh
     }
 }
 
-bool avr32_is_elf_file(char *filename){
+bool avr32_is_elf_file(const char *filename){
     FILE *firm_file = fopen(filename, "rb");
     char magic[4];
     int res = fread(&magic, 1, 4, firm_file);
