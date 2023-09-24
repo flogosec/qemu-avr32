@@ -3706,14 +3706,10 @@ static bool trans_STW_f2(DisasContext *ctx, arg_STW_f2 *a){
     return true;
 }
 
-//TODO: Continue renaming here
-
-static bool trans_STW_rp_rs_disp4(DisasContext *ctx, arg_STW_rp_rs_disp4 *a){
-    //stw_f3
+static bool trans_STW_f3(DisasContext *ctx, arg_STW_f3 *a){
     TCGv addr = tcg_temp_new_i32();
     tcg_gen_addi_i32(addr, cpu_r[a->rp], a->disp4<<2);
     tcg_gen_qemu_st_tl(cpu_r[a->rs], addr, 0, MO_BEUL);
-
 
     ctx->base.pc_next += 2;
     return true;

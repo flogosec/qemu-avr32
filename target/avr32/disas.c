@@ -344,7 +344,7 @@ INSN(STH_f5,   STH,                "%s, %s, %s, 0x%02x",            REG(a->rd), 
 INSN(STHc,     STH,                "%s, %s",                        REG(a->rp), REG(a->rd))
 
 INSN(STM,   STM,                "%d, rp: %s, list: 0x%04x",         a->op, REG(a->rp), a->list)
-INSN(STW_rp_rs_disp4, STW,      "%s, %s, 0x%04x",                   REG(a->rp), REG(a->rs), a->disp4)
+INSN(STW_f3, STW,               "%s, %s, 0x%04x",                   REG(a->rp), REG(a->rs), a->disp4)
 INSN(STW_f4, STW,               "%s, %s, 0x%04x",                   REG(a->rp), REG(a->rs), a->imm16)
 INSN(STW_f5, STW,               "%s, %s, %s",                       REG(a->rx), REG(a->ry), REG(a->rd))
 INSN(STW_f2, STW,               "%s, %s",                           REG(a->rp), REG(a->rs))
