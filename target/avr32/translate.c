@@ -3165,8 +3165,6 @@ static bool trans_RSUB_f2(DisasContext *ctx, arg_RSUB_f2 *a)
     tcg_gen_or_i32(temp, temp, left);
     tcg_gen_or_i32(cpu_sflags[sflagC], temp, right);
 
-
-
     ctx->base.pc_next += 4;
     return true;
 }
@@ -3369,8 +3367,31 @@ static bool trans_SCALL(DisasContext *ctx, arg_SCALL *a){
 
 
 static bool trans_SCR(DisasContext *ctx, arg_SCR *a){
-    //TODO
-    return false;
+    TCGv res = tcg_temp_new_i32();
+    TCGv res31 = tcg_temp_new_i32();
+    TCGv rd31 = tcg_temp_new_i32();
+
+    tcg_gen_sub_i32(res, cpu_r[a->rd], cpu_sflags[sflagC]);
+    tcg_gen_shri_i32(res31, res, 31);
+    tcg_gen_shri_i32(rd31, cpu_r[a->rd], 31);
+    tcg_gen_mov_i32(cpu_r[a->rd], res);
+
+    //V-Flag
+    tcg_gen_andc_i32(cpu_sflags[sflagV], rd31, res31);
+
+    //N-Flag
+    tcg_gen_mov_i32(cpu_sflags[sflagN], res31);
+
+    //Z-Flag
+    TCGv temp = tcg_temp_new_i32();
+    tcg_gen_setcondi_i32(TCG_COND_EQ, temp, res31, 0);
+    tcg_gen_and_i32(cpu_sflags[sflagZ], cpu_sflags[sflagZ], temp);
+
+    //C-Flag
+    tcg_gen_andc_i32(cpu_sflags[sflagC],  res31, rd31);
+
+    ctx->base.pc_next += 2;
+    return true;
 }
 
 //TODO: implement
