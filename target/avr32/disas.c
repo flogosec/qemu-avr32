@@ -278,7 +278,7 @@ INSN(MULHHW, MULHHW,       "%s, %s, %s",                     REG(a->rd), REG(a->
 INSN(MULUD, MUL,       "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
 
 INSN(MUSFR,      MUSFR,        "%s",                            REG(a->rs))
-INSN(MUSTR_rd,   MUSTR,        "%s",                            REG(a->rd))
+INSN(MUSTR,      MUSTR,        "%s",                            REG(a->rd))
 
 INSN(NEG_rd,   NEG,        "%s",                                REG(a->rd))
 INSN(NOP,   NOP,        "NOP: %d",                                12)

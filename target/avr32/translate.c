@@ -2545,8 +2545,26 @@ static bool trans_MUSFR(DisasContext *ctx, arg_MUSFR *a){
     return true;
 }
 
-static bool trans_MUSTR_rd(DisasContext *ctx, arg_MUSTR_rd *a){
-    return false;
+static bool trans_MUSTR(DisasContext *ctx, arg_MUSTR *a){
+    TCGv temp = tcg_temp_new_i32();
+
+    tcg_gen_mov_i32(temp, cpu_sflags[sflagV]);
+    tcg_gen_shli_i32(temp, temp, 3);
+    tcg_gen_mov_i32(cpu_r[a->rd], temp);
+
+    tcg_gen_mov_i32(temp, cpu_sflags[sflagN]);
+    tcg_gen_shli_i32(temp, temp, 2);
+    tcg_gen_or_i32(cpu_r[a->rd], cpu_r[a->rd],temp);
+
+    tcg_gen_mov_i32(temp, cpu_sflags[sflagZ]);
+    tcg_gen_shli_i32(temp, temp, 1);
+    tcg_gen_or_i32(cpu_r[a->rd], cpu_r[a->rd],temp);
+
+    tcg_gen_mov_i32(temp, cpu_sflags[sflagC]);;
+    tcg_gen_or_i32(cpu_r[a->rd], cpu_r[a->rd],temp);
+
+    ctx->base.pc_next +=2;
+    return true;
 }
 
 static bool trans_NEG_rd(DisasContext *ctx, arg_NEG_rd *a){
