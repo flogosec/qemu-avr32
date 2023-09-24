@@ -277,7 +277,7 @@ INSN(MUL_f3, MUL,       "%s, %s, 0x%04x",               REG(a->rd), REG(a->rs), 
 INSN(MULHHW, MULHHW,       "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
 INSN(MULUD, MUL,       "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
 
-INSN(MUSFR_rs,   MUSFR,        "%s",                            REG(a->rs))
+INSN(MUSFR,      MUSFR,        "%s",                            REG(a->rs))
 INSN(MUSTR_rd,   MUSTR,        "%s",                            REG(a->rd))
 
 INSN(NEG_rd,   NEG,        "%s",                                REG(a->rd))

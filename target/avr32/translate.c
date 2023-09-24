@@ -2525,8 +2525,24 @@ static bool trans_MULUD(DisasContext *ctx, arg_MULUD *a){
     return true;
 }
 
-static bool trans_MUSFR_rs(DisasContext *ctx, arg_MUSFR_rs *a){
-    return false;
+static bool trans_MUSFR(DisasContext *ctx, arg_MUSFR *a){
+    tcg_gen_mov_i32(cpu_sflags[sflagC], cpu_r[a->rs]);
+    tcg_gen_andi_i32(cpu_sflags[sflagC], cpu_sflags[sflagC], 0x1);
+
+    tcg_gen_mov_i32(cpu_sflags[sflagZ], cpu_r[a->rs]);
+    tcg_gen_shri_i32(cpu_sflags[sflagZ], cpu_sflags[sflagZ], 0x1);
+    tcg_gen_andi_i32(cpu_sflags[sflagZ], cpu_sflags[sflagZ], 0x1);
+
+    tcg_gen_mov_i32(cpu_sflags[sflagN], cpu_r[a->rs]);
+    tcg_gen_shri_i32(cpu_sflags[sflagN], cpu_sflags[sflagN], 0x2);
+    tcg_gen_andi_i32(cpu_sflags[sflagN], cpu_sflags[sflagN], 0x1);
+
+    tcg_gen_mov_i32(cpu_sflags[sflagV], cpu_r[a->rs]);
+    tcg_gen_shri_i32(cpu_sflags[sflagV], cpu_sflags[sflagV], 0x3);
+    tcg_gen_andi_i32(cpu_sflags[sflagV], cpu_sflags[sflagV], 0x1);
+
+    ctx->base.pc_next +=2;
+    return true;
 }
 
 static bool trans_MUSTR_rd(DisasContext *ctx, arg_MUSTR_rd *a){
