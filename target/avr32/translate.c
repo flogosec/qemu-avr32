@@ -3038,7 +3038,7 @@ static bool trans_RJMP(DisasContext *ctx, arg_RJMP *a){
     return true;
 }
 
-static bool trans_ROL_rd(DisasContext *ctx, arg_ROL_rd *a){
+static bool trans_ROL(DisasContext *ctx, arg_ROL *a){
     TCGv tempC = tcg_temp_new_i32();
     TCGv res = tcg_temp_new_i32();
 
@@ -3055,7 +3055,7 @@ static bool trans_ROL_rd(DisasContext *ctx, arg_ROL_rd *a){
     return true;
 }
 
-static bool trans_ROR_rd(DisasContext *ctx, arg_ROR_rd *a){
+static bool trans_ROR(DisasContext *ctx, arg_ROR *a){
 
     TCGv tempC = tcg_temp_new_i32();
     tcg_gen_andi_i32(tempC, cpu_r[a->rd], 0x00000001);
@@ -3118,7 +3118,7 @@ static bool trans_RSUB_f1(DisasContext *ctx, arg_RSUB_f1 *a){
     return true;
 }
 
-static bool trans_RSUB_rd_rs_imm8(DisasContext *ctx, arg_RSUB_rd_rs_imm8 *a)
+static bool trans_RSUB_f2(DisasContext *ctx, arg_RSUB_f2 *a)
 {
 
     int imm8 = a->imm8;

@@ -303,11 +303,11 @@ INSN(RETS,   RETS,        "RETS")
 
 INSN(RJMP,    RJMP,     "0x%04x, 0x%02x",                       a->disp8, a->disp2)
 
-INSN(ROL_rd,   ROL,        "%s",                                REG(a->rd))
-INSN(ROR_rd,   ROR,        "%s",                                REG(a->rd))
+INSN(ROL,   ROL,        "%s",                                REG(a->rd))
+INSN(ROR,   ROR,        "%s",                                REG(a->rd))
 
 INSN(RSUB_f1,   RSUB,        "%s, %s",                          REG(a->rd), REG(a->rs))
-INSN(RSUB_rd_rs_imm8,   RSUB,        "%s, %s, 0x%04x",          REG(a->rd), REG(a->rs), a->imm8)
+INSN(RSUB_f2,   RSUB,        "%s, %s, 0x%04x",          REG(a->rd), REG(a->rs), a->imm8)
 INSN(RSUBc,   RSUBc,        "%s, %d",                          REG(a->rd), a->imm8)
 
 INSN(SATU,   SATU,       "%s, bp5: 0x%04x, sa5: 0x%02x",         REG(a->rd), a->bp5, a->sa5)
