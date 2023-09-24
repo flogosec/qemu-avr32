@@ -2079,7 +2079,7 @@ static bool trans_LSR_f3(DisasContext *ctx, arg_LSR_f3 *a)
 }
 
 
-static bool trans_MAC(DisasContext *ctx, arg_MAC_rd_rx_ry *a)
+static bool trans_MAC(DisasContext *ctx, arg_MAC *a)
 {
     TCGv temp = tcg_temp_new_i32();
     tcg_gen_mul_i32(temp, cpu_r[a->rx],cpu_r[a->ry]);
@@ -2170,7 +2170,7 @@ static bool trans_MACHHW(DisasContext *ctx, arg_MACHHW *a)
 }
 
 //TODO: add tests
-static bool trans_MACSD(DisasContext *ctx, arg_MACUd *a){
+static bool trans_MACSD(DisasContext *ctx, arg_MACSD*a){
     TCGv_i64 rdp = tcg_temp_new_i64();
     TCGv_i64 rd = tcg_temp_new_i64();
     TCGv_i64 acc = tcg_temp_new_i64();
@@ -2196,7 +2196,7 @@ static bool trans_MACSD(DisasContext *ctx, arg_MACUd *a){
 
 //TODO implement MACSATHH.W insn
 
-static bool trans_MACUD(DisasContext *ctx, arg_MACUd *a){
+static bool trans_MACUD(DisasContext *ctx, arg_MACUD *a){
     TCGv_i64 rdp = tcg_temp_new_i64();
     TCGv_i64 rd = tcg_temp_new_i64();
     TCGv_i64 acc = tcg_temp_new_i64();
@@ -2222,7 +2222,7 @@ static bool trans_MACUD(DisasContext *ctx, arg_MACUd *a){
 
 //TODO: implement MACWH.D insn
 
-static bool trans_MAX(DisasContext *ctx, arg_MAX_rd_rx_ry *a)
+static bool trans_MAX(DisasContext *ctx, arg_MAX *a)
 {
 
     TCGLabel *if_1 = gen_new_label();
@@ -2245,7 +2245,7 @@ static bool trans_MAX(DisasContext *ctx, arg_MAX_rd_rx_ry *a)
     return true;
 }
 
-static bool trans_MCALL(DisasContext *ctx, arg_MCALL_rp_disp *a)
+static bool trans_MCALL(DisasContext *ctx, arg_MCALL *a)
 {
     tcg_gen_addi_i32(cpu_r[LR_REG], cpu_r[PC_REG], 0x4);
     TCGv PC = cpu_r[PC_REG];
@@ -2272,9 +2272,24 @@ static bool trans_MCALL(DisasContext *ctx, arg_MCALL_rp_disp *a)
     return true;
 }
 
-static bool trans_MEMC_bp5_imm15(DisasContext *ctx, arg_MEMC_bp5_imm15 *a)
+static bool trans_MEMC(DisasContext *ctx, arg_MEMC *a)
 {
-    return false;
+    TCGv addr = tcg_temp_new_i32();
+    TCGv mem_word = tcg_temp_new_i32();
+    TCGv mask = tcg_temp_new_i32();
+
+    tcg_gen_movi_i32(addr, a->imm15);
+    tcg_gen_shli_i32(addr, addr, 2);
+    tcg_gen_qemu_ld_i32(mem_word, addr, 0, MO_UW);
+
+    tcg_gen_movi_i32(mask, 0xFFFFFFFE);
+    tcg_gen_rotli_i32(mask, mask, a->bp5);
+    tcg_gen_and_i32(mem_word, mem_word, mask);
+
+    tcg_gen_qemu_st_i32(mem_word, addr, 0, MO_UW);
+
+    ctx->base.pc_next += 4;
+    return true;
 }
 
 static bool trans_MEMS_bp5_imm15(DisasContext *ctx, arg_MEMS_bp5_imm15 *a)
