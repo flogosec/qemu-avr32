@@ -2822,8 +2822,36 @@ static bool trans_PUSHM(DisasContext *ctx, arg_PUSHM *a){
     return true;
 }
 
-static bool trans_RCALL_disp10(DisasContext *ctx, arg_RCALL_disp10 *a){
-    return false;
+static bool trans_RCALL_f1(DisasContext *ctx, arg_RCALL_f1 *a){
+    uint32_t disp = a->disp2 << 8;
+    disp |= a->disp8;
+    if(disp >> 9 == 1){
+        disp |= 0xFFFFFC00;
+    }
+    disp = disp << 1;
+
+    tcg_gen_addi_i32(cpu_r[AVR32A_LR_REG], cpu_r[AVR32A_PC_REG], 2);
+    tcg_gen_addi_i32(cpu_r[AVR32A_PC_REG], cpu_r[AVR32A_PC_REG], disp);
+
+    ctx->base.is_jmp = DISAS_JUMP;
+    ctx->base.pc_next += 2;
+    return true;
+}
+
+static bool trans_RCALL_f2(DisasContext *ctx, arg_RCALL_f2 *a){
+    uint32_t disp = a->immu << 17;
+    disp |= a->immm << 16;
+    disp |= a->imml;
+    if(disp >> 20 == 1){
+        disp |= 0xFFE00000;
+    }
+    disp = disp << 1;
+    tcg_gen_addi_i32(cpu_r[AVR32A_LR_REG], cpu_r[AVR32A_PC_REG], 2);
+    tcg_gen_addi_i32(cpu_r[AVR32A_PC_REG], cpu_r[AVR32A_PC_REG], disp);
+
+    ctx->base.is_jmp = DISAS_JUMP;
+    ctx->base.pc_next += 4;
+    return true;
 }
 
 static bool trans_RET(DisasContext *ctx, arg_RET *a){

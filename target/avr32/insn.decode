@@ -339,7 +339,8 @@ ORL             111 010000001 .... ................         @op_rd_imm16
 POPM            110 1 ......... 010                          @op_popm
 PUSHM           110 1 ........ 0001                         @op_pushm
 
-RCALL_disp10    110 0 ........ 11 ..                        @op_disp8_disp2
+RCALL_f1        110 0 ........ 11 ..                        @op_disp8_disp2
+RCALL_f2        111 .... 0101 . .... ................       @op_rd_imm21
 
 RET             010 1111 0 .... ....                        @op_rd_cond4
 RETE            1101011 00000 0011

@@ -294,7 +294,8 @@ INSN(ORL,   ORL,        "%s, 0x%04x",                           REG(a->rd), a->i
 INSN(POPM,   POPM,        "0x%04x",                           a->list)
 INSN(PUSHM,   PUSHM,        "0x%04x",                           a->list)
 
-INSN(RCALL_disp10,    RCALL,     "0x%04x, 0x%02x",              a->disp8, a->disp2)
+INSN(RCALL_f1,    RCALL,     "0x%04x, 0x%02x",                  a->disp8, a->disp2)
+INSN(RCALL_f2,    RCALL,     "0x%04x, 0x%02x, 0x%02x",          a->immu, a->immm, a->imml)
 
 INSN(RET,   RET,        "%s, %d",                               REG(a->rd), a->cond4)
 INSN(RETE,   RETE,        "RETE")
