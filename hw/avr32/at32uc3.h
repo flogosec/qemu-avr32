@@ -35,6 +35,7 @@
 #include "hw/avr32/at32uc3_scif.h"
 #include "hw/avr32/at32uc3_intc.h"
 #include "hw/avr32/at32uc3_wdt.h"
+#include "hw/avr32/at32uc3_gpioc.h"
 #include "hw/misc/unimp.h"
 
 #define AT32UC3C_MAX_SPIS 2
@@ -90,6 +91,7 @@ struct AT32UC3CSocState {
     AT32UC3SCIFState scif;
     AT32UC3INTCState intc;
     AT32UC3WDTState wdt;
+    AT32UC3GPIOCState gpioc;
 };
 
 
