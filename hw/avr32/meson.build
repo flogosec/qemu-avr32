@@ -21,6 +21,7 @@ avr32_ss.add(files('nanomind_a3200.c'))
 avr32_ss.add(files('nanopower-p31u.c'))
 avr32_ss.add(files('at32uc3_wdt.c'))
 avr32_ss.add(files('at32uc3_gpioc.c'))
+avr32_ss.add(files('at32uc3_sdramc.c'))
 
 avr32_ss.add(files('opssat-payl-mock.c'))
 avr32_ss.add(when: 'CONFIG_NANOCOM_AX100', if_true: files('nanocom_ax100.c'))

@@ -50,6 +50,7 @@ static const uint32_t intc_addr = 0xffff0000;
 static const uint32_t scif_addr = 0xffff0800;
 static const uint32_t wdt_addr = 0xffff1000;
 static const uint32_t gpioc_addr = 0xFFFF2000;
+static const uint32_t sdramc_addr = 0xFFFE2C00;
 
 // TODO The IRQ numbers are just arbitrary
 static const int timer_irq = AT32UC3C_IRQ_TC02;
@@ -95,6 +96,7 @@ struct AT32UC3CSocClass {
     size_t scif_count;
     size_t intc_count;
     size_t gpioc_count;
+    size_t sdramc_count;
 };
 
 typedef struct AT32UC3CSocClass AT32UC3CSocClass;
@@ -179,6 +181,14 @@ static void at32uc3_realize(DeviceState *dev_soc, Error **errp)
     }
     busdev = SYS_BUS_DEVICE(dev);
     sysbus_mmio_map(busdev, 0, gpioc_addr);
+
+    /* SDRAMC */
+    dev = DEVICE(&(s->sdramc));
+    if (!sysbus_realize(SYS_BUS_DEVICE(&s->sdramc), errp)) {
+        return;
+    }
+    busdev = SYS_BUS_DEVICE(dev);
+    sysbus_mmio_map(busdev, 0, sdramc_addr);
 
     /* pdca */
     pdca_dev = DEVICE(&(s->pdca));
@@ -334,6 +344,7 @@ static void at32uc3c_inst_init(Object *obj)
 
     object_initialize_child(obj, "wdt", &s->wdt, TYPE_AT32UC3_WDT);
     object_initialize_child(obj, "gpioc", &s->gpioc, TYPE_AT32UC3_GPIOC);
+    object_initialize_child(obj, "sdramc", &s->sdramc, TYPE_AT32UC3_SDRAMC);
 }
 
 static void at32uc3c_class_init(ObjectClass *oc, void *data)
@@ -363,6 +374,7 @@ static void at32uc3c0512c_class_init(ObjectClass *oc, void *data)
     at32uc3->scif_count = 1;
     at32uc3->intc_count = 1;
     at32uc3->gpioc_count = 1;
+    at32uc3->sdramc_count = 1;
 }
 
 static const TypeInfo at32uc3c_soc_types[] = {

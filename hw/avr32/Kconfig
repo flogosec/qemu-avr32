@@ -77,6 +77,9 @@ config AT32UC3_WDT
 config AT32UC3_GPIOC
     bool
 
+config AT32UC3_SDRAMC
+    bool
+
 config NANOMIND_A3200
     bool
     select AT32UC3_MCU
@@ -94,6 +97,7 @@ config NANOMIND_A3200
     select NANOPOWER_P31U
     select AT32UC3_WDT
     select AT32UC3_GPIOC
+    select AT32UC3_SDRAMC
     select UNIMP
     select NANOCOM_AX100
     select OPSSAT_SIM_AGENT
