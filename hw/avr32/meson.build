@@ -21,5 +21,6 @@ avr32_ss.add(files('nanomind_a3200.c'))
 avr32_ss.add(files('nanopower-p31u.c'))
 avr32_ss.add(files('at32uc3_wdt.c'))
 avr32_ss.add(files('at32uc3_gpioc.c'))
+avr32_ss.add(files('at32uc3_sdramc.c'))
 
 hw_arch += {'avr32': avr32_ss}
