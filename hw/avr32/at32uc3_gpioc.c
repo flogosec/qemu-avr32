@@ -148,67 +148,73 @@ static void at32uc_gpioc_write(void *opaque, hwaddr offset, uint64_t val64, unsi
         return;
     }
 
-    //printf("[GPIOC_write] Port: %i, ", port);
+    printf("[GPIOC_write] Port: %i, ", port);
     switch(reg) {
         case GPIO_ENABLE_REG: {
-            //printf("GPIO_ENABLE_REG, op: ");
+            printf("GPIO_ENABLE_REG ");
             break;
         }
         case P_MUX0_REG: {
-            //printf("P_MUX0_REG, op: ");
+            printf("P_MUX0_REG ");
             break;
         }
         case P_MUX1_REG: {
-            //printf("P_MUX1_REG, op: ");
+            printf("P_MUX1_REG ");
             break;
         }
         case P_MUX2_REG: {
-            //printf("P_MUX2_REG, op: ");
+            printf("P_MUX2_REG ");
             break;
         }
         case OUTPUT_DRIVER_ENABLE_REG: {
-            //printf("OUTPUT_DRIVER_ENABLE_REG, op: ");
+            printf("OUTPUT_DRIVER_ENABLE_REG ");
             break;
         }
         case OUTPUT_VALUE_REG: {
-            //printf("OUTPUT_VALUE_REG, op: ");
+            printf("OUTPUT_VALUE_REG ");
             break;
         }
         case PULL_UP_ENABLE_REG: {
-            //printf("PULL_UP_ENABLE_REG, op: ");
+            printf("PULL_UP_ENABLE_REG ");
             break;
         }
         case PULL_DOWN_ENABLE_REG: {
-            //printf("PULL_DOWN_ENABLE_REG, op: ");
+            printf("PULL_DOWN_ENABLE_REG ");
             break;
         }
         case OUTPUT_DRV_CAP0_REG: {
-            //printf("OUTPUT_DRV_CAP0_REG, op: ");
+            printf("OUTPUT_DRV_CAP0_REG ");
             break;
         }
         default: {
-            //printf("NA (0x%x) op: ", reg);
+            printf("NA (0x%x) op: ", reg);
             break;
         }
     }
     switch(operation) {
         case GPIOC_READ_WRITE: {
-            //printf("WRITE: 0x%x\n", (uint32_t)val64);
+            printf("WRITE: 0x%x\n", (uint32_t)val64);
             s->ports[port].registers[reg] = (uint32_t)val64;
             break;
         }
         case GPIOC_SET: {
-            //printf("SET: 0x%x\n", (uint32_t)val64);
+            printf("SET: 0x%x\n", (uint32_t)val64);
             s->ports[port].registers[reg] |= (uint32_t)val64;
             break;
         }
         case GPIOC_CLEAR: {
-            //printf("CLEAR: 0x%x\n", (uint32_t)val64);
             s->ports[port].registers[reg] &= ~(uint32_t)val64;
+            printf("CLEAR: 0x%x, new val: 0x%04x\n", (uint32_t)val64, s->ports[port].registers[reg]);
             break;
         }
         case GPIOC_TOGGLE: {
-            printf("TOGGLE (not implemented!): 0x%x\n", (uint32_t)val64);
+            for(int i = 0; i < 32; i++){
+                if(val64 & ((uint32_t)1 << i)){
+                    //TODO: add test to testing framework
+                    s->ports[port].registers[reg] ^= ((uint32_t)1 << i);
+                }
+            }
+            printf("TOGGLE: 0x%x, new val: 0x04%x\n", (uint32_t)val64, s->ports[port].registers[reg]);
             break;
         }
     }
