@@ -4151,13 +4151,13 @@ static void avr32_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
 {
     DisasContext *ctx = container_of(dcbase, DisasContext, base);
 
-    //TODO: Implement proper hardware emulation to prevent endless loops in OPS-SAT firmware startup
+    //TODO: Implement proper COUNT sysreg to prevent endless loops in OPS-SAT firmware startup
     if(
             (ctx->base.pc_next == 0xd00c106a)|| //ops-firmware sdramc_init
             (ctx->base.pc_next == 0xd00c1022)|| //ops-firmware sdramc_init
             (ctx->base.pc_next == 0xd00c0fb2)|| //ops-firmware sdramc_init
-            (ctx->base.pc_next == 0xd00c0fde)|| //ops-firmware sdramc_init
-            (ctx->base.pc_next == 0xd00c2558)) //ops-firmware wd-clear
+            (ctx->base.pc_next == 0xd00c0fde) //ops-firmware sdramc_init
+      )
     {
         ctx->base.pc_next += 2;
     }
