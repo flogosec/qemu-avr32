@@ -3755,7 +3755,7 @@ static bool trans_STWcond(DisasContext *ctx, arg_STWcond *a){
     return true;
 }
 
-static bool trans_SUB_rd_rs(DisasContext *ctx, arg_SUB_rd_rs *a){
+static bool trans_SUB_f1(DisasContext *ctx, arg_SUB_f1 *a){
     TCGv op1 = tcg_temp_new_i32();
     TCGv op2 = tcg_temp_new_i32();
     tcg_gen_mov_i32(op1, cpu_r[a->rd]);
@@ -3798,7 +3798,50 @@ static bool trans_SUB_rd_rs(DisasContext *ctx, arg_SUB_rd_rs *a){
     return true;
 }
 
-static bool trans_SUB_rd_imm8(DisasContext *ctx, arg_SUB_rd_imm8 *a){
+static bool trans_SUB_f2(DisasContext *ctx, arg_SUB_f2 *a){
+    //Format 2
+    TCGv op1 = tcg_temp_new_i32();
+    TCGv op2 = tcg_temp_new_i32();
+    tcg_gen_shli_i32(op2, cpu_r[a->ry], a->sa);
+
+    tcg_gen_mov_i32(op1, cpu_r[a->rx]);
+
+    TCGv left = tcg_temp_new_i32();
+    TCGv middel = tcg_temp_new_i32();
+    TCGv right = tcg_temp_new_i32();
+    TCGv res = tcg_temp_new_i32();
+    tcg_gen_sub_i32(res, op1, op2);
+    tcg_gen_sub_i32(cpu_r[a->rd], op1, op2);
+
+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_sflags[sflagZ], res, 0); // Zf = Res == 0
+
+    tcg_gen_shri_i32(res, res, 31);
+    tcg_gen_shri_i32(op1, op1, 31);
+    tcg_gen_shri_i32(op2, op2, 31);
+
+    //V-Flag
+    tcg_gen_andc_i32(left, op1, op2);
+    tcg_gen_andc_i32(left, left, res);
+    tcg_gen_and_i32(right, op2, res);
+    tcg_gen_andc_i32(right, right, op1);
+    tcg_gen_or_i32(cpu_sflags[sflagV], left, right);
+
+    //N-Flag
+    tcg_gen_mov_i32(cpu_sflags[sflagN], res);
+
+    //C-Flag
+    tcg_gen_andc_i32(left, op2, op1);
+    tcg_gen_and_i32(middel, op2, res);
+    tcg_gen_andc_i32(right, res, op1);
+
+    tcg_gen_or_i32(left, left, middel);
+    tcg_gen_or_i32(cpu_sflags[sflagC], left, right);
+
+    ctx->base.pc_next += 4;
+    return true;
+}
+
+static bool trans_SUB_f3(DisasContext *ctx, arg_SUB_f3 *a){
 
     TCGv op1 = tcg_temp_new_i32();
     TCGv op2 = tcg_temp_new_i32();
@@ -3852,100 +3895,7 @@ static bool trans_SUB_rd_imm8(DisasContext *ctx, arg_SUB_rd_imm8 *a){
     return true;
 }
 
-static bool trans_SUB_rd_rx_ry_sa(DisasContext *ctx, arg_SUB_rd_rx_ry_sa *a){
-    //Format 2
-    TCGv op1 = tcg_temp_new_i32();
-    TCGv op2 = tcg_temp_new_i32();
-    tcg_gen_shli_i32(op2, cpu_r[a->ry], a->sa);
-
-    tcg_gen_mov_i32(op1, cpu_r[a->rx]);
-
-    TCGv left = tcg_temp_new_i32();
-    TCGv middel = tcg_temp_new_i32();
-    TCGv right = tcg_temp_new_i32();
-    TCGv res = tcg_temp_new_i32();
-    tcg_gen_sub_i32(res, op1, op2);
-    tcg_gen_sub_i32(cpu_r[a->rd], op1, op2);
-
-    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_sflags[sflagZ], res, 0); // Zf = Res == 0
-
-    tcg_gen_shri_i32(res, res, 31);
-    tcg_gen_shri_i32(op1, op1, 31);
-    tcg_gen_shri_i32(op2, op2, 31);
-
-    //V-Flag
-    tcg_gen_andc_i32(left, op1, op2);
-    tcg_gen_andc_i32(left, left, res);
-    tcg_gen_and_i32(right, op2, res);
-    tcg_gen_andc_i32(right, right, op1);
-    tcg_gen_or_i32(cpu_sflags[sflagV], left, right);
-
-    //N-Flag
-    tcg_gen_mov_i32(cpu_sflags[sflagN], res);
-
-    //C-Flag
-    tcg_gen_andc_i32(left, op2, op1);
-    tcg_gen_and_i32(middel, op2, res);
-    tcg_gen_andc_i32(right, res, op1);
-
-    tcg_gen_or_i32(left, left, middel);
-    tcg_gen_or_i32(cpu_sflags[sflagC], left, right);
-
-    ctx->base.pc_next += 4;
-    return true;
-}
-
-static bool trans_SUB_rs_rd_imm(DisasContext *ctx, arg_SUB_rs_rd_imm *a){
-
-    int imm = a->imm16;
-
-    //Sign extend
-    if(imm >> 15){
-        imm = imm|0xFFFF0000;
-    }
-
-    TCGv op1 = tcg_temp_new_i32();
-    TCGv op2 = tcg_temp_new_i32();
-    tcg_gen_mov_i32(op1, cpu_r[a->rs]);
-    tcg_gen_movi_i32(op2, imm);
-
-    TCGv left = tcg_temp_new_i32();
-    TCGv middel = tcg_temp_new_i32();
-    TCGv right = tcg_temp_new_i32();
-    TCGv res = tcg_temp_new_i32();
-    tcg_gen_sub_i32(res, op1, op2);
-    tcg_gen_sub_i32(cpu_r[a->rd], op1, op2);
-    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_sflags[sflagZ], res, 0); // Zf = Res == 0
-
-
-
-    tcg_gen_shri_i32(res, res, 31);
-    tcg_gen_shri_i32(op1, op1, 31);
-    tcg_gen_shri_i32(op2, op2, 31);
-
-    //V-Flag
-    tcg_gen_andc_i32(left, op1, op2);
-    tcg_gen_andc_i32(left, left, res);
-    tcg_gen_and_i32(right, op2, res);
-    tcg_gen_andc_i32(right, right, op1);
-    tcg_gen_or_i32(cpu_sflags[sflagV], left, right);
-
-    //N-Flag
-    tcg_gen_mov_i32(cpu_sflags[sflagN], res);
-
-    //C-Flag
-    tcg_gen_andc_i32(left, op2, op1);
-    tcg_gen_and_i32(middel, op2, res);
-    tcg_gen_andc_i32(right, res, op1);
-
-    tcg_gen_or_i32(left, left, middel);
-    tcg_gen_or_i32(cpu_sflags[sflagC], left, right);
-
-    ctx->base.pc_next += 4;
-    return true;
-}
-
-static bool trans_SUB_rd_imm21(DisasContext *ctx, arg_SUB_rd_imm21 *a){
+static bool trans_SUB_f4(DisasContext *ctx, arg_SUB_f4 *a){
 
     int imm = a->imml;
     imm |= (a->immm << 16);
@@ -3991,6 +3941,56 @@ static bool trans_SUB_rd_imm21(DisasContext *ctx, arg_SUB_rd_imm21 *a){
     tcg_gen_or_i32(left, left, middel);
     tcg_gen_or_i32(cpu_sflags[sflagC], left, right);
 
+
+    ctx->base.pc_next += 4;
+    return true;
+}
+
+static bool trans_SUB_f5(DisasContext *ctx, arg_SUB_f5 *a){
+
+    int imm = a->imm16;
+
+    //Sign extend
+    if(imm >> 15){
+        imm = imm|0xFFFF0000;
+    }
+
+    TCGv op1 = tcg_temp_new_i32();
+    TCGv op2 = tcg_temp_new_i32();
+    tcg_gen_mov_i32(op1, cpu_r[a->rs]);
+    tcg_gen_movi_i32(op2, imm);
+
+    TCGv left = tcg_temp_new_i32();
+    TCGv middel = tcg_temp_new_i32();
+    TCGv right = tcg_temp_new_i32();
+    TCGv res = tcg_temp_new_i32();
+    tcg_gen_sub_i32(res, op1, op2);
+    tcg_gen_sub_i32(cpu_r[a->rd], op1, op2);
+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_sflags[sflagZ], res, 0); // Zf = Res == 0
+
+
+
+    tcg_gen_shri_i32(res, res, 31);
+    tcg_gen_shri_i32(op1, op1, 31);
+    tcg_gen_shri_i32(op2, op2, 31);
+
+    //V-Flag
+    tcg_gen_andc_i32(left, op1, op2);
+    tcg_gen_andc_i32(left, left, res);
+    tcg_gen_and_i32(right, op2, res);
+    tcg_gen_andc_i32(right, right, op1);
+    tcg_gen_or_i32(cpu_sflags[sflagV], left, right);
+
+    //N-Flag
+    tcg_gen_mov_i32(cpu_sflags[sflagN], res);
+
+    //C-Flag
+    tcg_gen_andc_i32(left, op2, op1);
+    tcg_gen_and_i32(middel, op2, res);
+    tcg_gen_andc_i32(right, res, op1);
+
+    tcg_gen_or_i32(left, left, middel);
+    tcg_gen_or_i32(cpu_sflags[sflagC], left, right);
 
     ctx->base.pc_next += 4;
     return true;
