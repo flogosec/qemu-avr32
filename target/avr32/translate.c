@@ -2099,7 +2099,6 @@ static bool trans_MACHHD(DisasContext *ctx, arg_MACHHD *a){
     return true;
 }
 
-//TODO: add more tests
 static bool trans_MACHHW(DisasContext *ctx, arg_MACHHW *a){
     TCGv operand1 = tcg_temp_new_i32();
     TCGv operand2 = tcg_temp_new_i32();
@@ -2130,7 +2129,6 @@ static bool trans_MACHHW(DisasContext *ctx, arg_MACHHW *a){
     return true;
 }
 
-//TODO: add tests
 static bool trans_MACSD(DisasContext *ctx, arg_MACSD*a){
     TCGv_i64 rdp = tcg_temp_new_i64();
     TCGv_i64 rd = tcg_temp_new_i64();
@@ -2155,7 +2153,33 @@ static bool trans_MACSD(DisasContext *ctx, arg_MACSD*a){
     return true;
 }
 
-//TODO implement MACSATHH.W insn
+static bool trans_MACSATHHW(DisasContext *ctx, arg_MACSATHHW *a) {
+    TCGv operand1 = tcg_temp_new_i32();
+    TCGv operand2 = tcg_temp_new_i32();
+
+    //TODO: Move segment to helper function. Also in other translation functions.
+    if(a->x == 1){
+        tcg_gen_shri_i32(operand1, cpu_r[a->rx], 16);
+        tcg_gen_ext16s_i32(operand1, operand1);
+    }
+    else{
+        tcg_gen_andi_i32(operand1, cpu_r[a->rx], 0x0000FFFF);
+        tcg_gen_ext16s_i32(operand1, operand1);
+    }
+    if(a->y == 1){
+        tcg_gen_shri_i32(operand2, cpu_r[a->ry], 16);
+        tcg_gen_ext16s_i32(operand2, operand2);
+    }
+    else{
+        tcg_gen_andi_i32(operand2, cpu_r[a->ry], 0x0000FFFF);
+        tcg_gen_ext16s_i32(operand2, operand2);
+    }
+
+    gen_helper_macsathhw(cpu_env, tcg_constant_i32(a->rd), operand1, operand2);
+
+    ctx->base.pc_next += 4;
+    return true;
+}
 
 static bool trans_MACUD(DisasContext *ctx, arg_MACUD *a){
     TCGv_i64 rdp = tcg_temp_new_i64();

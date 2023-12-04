@@ -246,6 +246,7 @@ INSN(MAC,               MAC,       "%s, %s, %s",                     REG(a->rd),
 INSN(MACHHD,            MACHHD,       "%s, %s, %s",                  REG(a->rd), REG(a->rx), REG(a->ry))
 INSN(MACHHW,            MACHHW,       "%s, %s, %s",                  REG(a->rd), REG(a->rx), REG(a->ry))
 INSN(MACSD,             MACSD,     "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(MACSATHHW,         MACSATHHW,     "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
 INSN(MACUD,             MACUd,     "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
 
 INSN(MAX,                MAX,       "%s, %s, %s",                  REG(a->rd), REG(a->rx), REG(a->ry))
