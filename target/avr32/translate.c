@@ -2054,7 +2054,6 @@ static bool trans_MAC(DisasContext *ctx, arg_MAC *a){
     return true;
 }
 
-//TODO: verify interpretation of manual. Tests work, but implementation may be wrong.
 static bool trans_MACHHD(DisasContext *ctx, arg_MACHHD *a){
     TCGv_i64 operand1 = tcg_temp_new_i64();
     TCGv_i64 operand2 = tcg_temp_new_i64();
@@ -2063,6 +2062,7 @@ static bool trans_MACHHD(DisasContext *ctx, arg_MACHHD *a){
     TCGv_i64 rx = tcg_temp_new_i64();
     TCGv_i64 ry = tcg_temp_new_i64();
     TCGv_i64 res = tcg_temp_new_i64();
+    TCGv_i64 dwr = tcg_temp_new_i64();
     tcg_gen_extu_i32_i64(rdp, cpu_r[a->rd+1]);
     tcg_gen_extu_i32_i64(rd, cpu_r[a->rd]);
     tcg_gen_extu_i32_i64(rx, cpu_r[a->rx]);
@@ -2086,16 +2086,14 @@ static bool trans_MACHHD(DisasContext *ctx, arg_MACHHD *a){
     }
 
     tcg_gen_mul_i64(res, operand1, operand2);
-    tcg_gen_andi_i64(res, res, 0x00000000FFFFFFFF);
 
-    tcg_gen_shli_i64(rdp, rdp, 32);
-    tcg_gen_or_i64(rdp, rdp, rd);
-    tcg_gen_shri_i64(rdp, rdp, 16);
-
-    tcg_gen_add_i64(res, res, rdp);
-    tcg_gen_shli_i64(res, res, 16);
-
-    tcg_gen_extr_i64_i32(cpu_r[a->rd], cpu_r[a->rd+1], res);
+    tcg_gen_mov_i64(dwr, rdp);
+    tcg_gen_shli_i64(dwr, dwr, 32);
+    tcg_gen_or_i64(dwr, dwr, rd);
+    tcg_gen_shri_i64(dwr, dwr, 16);
+    tcg_gen_add_i64(dwr, dwr, res);
+    tcg_gen_shli_i64(dwr, dwr, 16);
+    tcg_gen_extr_i64_i32(cpu_r[a->rd], cpu_r[a->rd+1], dwr);
 
     ctx->base.pc_next += 4;
     return true;
