@@ -2651,6 +2651,7 @@ static bool trans_ORL(DisasContext *ctx, arg_ORH *a){
     return true;
 }
 
+//TODO: check if helper should be used
 static bool trans_POPM(DisasContext *ctx, arg_POPM *a){
     bool setFlags = false;
 
@@ -2742,6 +2743,7 @@ static bool trans_POPM(DisasContext *ctx, arg_POPM *a){
     return true;
 }
 
+//TODO: check if helper should be used
 static bool trans_PUSHM(DisasContext *ctx, arg_PUSHM *a){
     TCGv sp = cpu_r[SP_REG];
     if (((a->list >> 0) & 1) == 1){
@@ -2869,6 +2871,7 @@ static bool trans_RET(DisasContext *ctx, arg_RET *a){
     return true;
 }
 
+//TODO: check if helper should be used
 static bool trans_RETE(DisasContext *ctx, arg_RETE *a){
     TCGLabel *if_1 = gen_new_label();
     TCGLabel *exit = gen_new_label();
@@ -2938,6 +2941,7 @@ static bool trans_RETE(DisasContext *ctx, arg_RETE *a){
     return true;
 }
 
+//TODO: check if helper should be used
 static bool trans_RETS(DisasContext *ctx, arg_RETS *a){
     TCGLabel *if_1 = gen_new_label();
     TCGLabel *if_1_else_if = gen_new_label();
@@ -3158,6 +3162,7 @@ static bool trans_RSUBc(DisasContext *ctx, arg_RSUBc *a){
     return true;
 }
 
+//TODO: check if helper should be used
 static bool trans_SATU(DisasContext *ctx, arg_SATU *a){
     TCGLabel *if1 = gen_new_label();
     TCGLabel *if1_else = gen_new_label();
@@ -3276,6 +3281,7 @@ static bool trans_SBR(DisasContext *ctx, arg_SBR *a){
     return true;
 }
 
+//TODO: check if helper should be used
 static bool trans_SCALL(DisasContext *ctx, arg_SCALL *a){
     TCGLabel *if_1 = gen_new_label();
     TCGLabel *if_1_else = gen_new_label();
@@ -3952,6 +3958,7 @@ static bool trans_SUB_f5(DisasContext *ctx, arg_SUB_f5 *a){
 }
 
 //TODO: check if f needs to be set or not, as manual has contradictory statements
+//TODO: check if helper should be used
 static bool trans_SUBc_f1(DisasContext *ctx, arg_SUBc_f1 *a){
     TCGLabel *if1 = gen_new_label();
     TCGLabel *exit = gen_new_label();
