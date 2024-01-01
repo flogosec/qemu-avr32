@@ -246,6 +246,7 @@ INSN(MAC,               MAC,       "%s, %s, %s",                     REG(a->rd),
 INSN(MACHHD,            MACHHD,       "%s, %s, %s",                  REG(a->rd), REG(a->rx), REG(a->ry))
 INSN(MACHHW,            MACHHW,       "%s, %s, %s",                  REG(a->rd), REG(a->rx), REG(a->ry))
 INSN(MACSD,             MACSD,     "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(MACSATHHW,         MACSATHHW,     "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
 INSN(MACUD,             MACUd,     "%s, %s, %s",                     REG(a->rd), REG(a->rx), REG(a->ry))
 
 INSN(MAX,                MAX,       "%s, %s, %s",                  REG(a->rd), REG(a->rx), REG(a->ry))
@@ -351,13 +352,13 @@ INSN(STW_f2, STW,               "%s, %s",                           REG(a->rp), 
 INSN(STW_f1, STW,               "%s, %s",                           REG(a->rp), REG(a->rs))
 INSN(STWcond, STWc,             "%s, %s, %d, 0x%04x",                           REG(a->rd), REG(a->rp), a->cond4, a->disp9)
 
-INSN(SUB_rd_rs,     SUB,        "%s, %s",                           REG(a->rs), REG(a->rd))
-INSN(SUB_rd_imm8,   SUB,        "%s, 0x%0x4",                       REG(a->rd), a->imm8)
-INSN(SUB_rd_rx_ry_sa,   SUB,    "%s",                               REG(a->rd))
-INSN(SUB_rs_rd_imm,     SUB,    "%s, %s, 0x%0x4",                   REG(a->rs), REG(a->rd), a->imm16)
-INSN(SUB_rd_imm21,   SUB,        "%s",                              REG(a->rd))
-INSN(SUBc_f1,       SUBc,        "%s, %d, %d, %0x2",                REG(a->rd), a->f, a->cond4, a->imm8)
-INSN(SUBc_f2,       SUBc,        "%s, %s, %s",                      REG(a->rd), REG(a->rx), REG(a->ry))
+INSN(SUB_f1,        SUB,        "%s, %s",                           REG(a->rs), REG(a->rd))
+INSN(SUB_f2,        SUB,        "%s",                               REG(a->rd))
+INSN(SUB_f3,        SUB,        "%s, 0x%0x4",                       REG(a->rd), a->imm8)
+INSN(SUB_f4,        SUB,        "%s",                               REG(a->rd))
+INSN(SUB_f5,        SUB,        "%s, %s, 0x%0x4",                   REG(a->rs), REG(a->rd), a->imm16)
+INSN(SUBc_f1,       SUBc,       "%s, %d, %d, %0x2",                 REG(a->rd), a->f, a->cond4, a->imm8)
+INSN(SUBc_f2,       SUBc,       "%s, %s, %s",                       REG(a->rd), REG(a->rx), REG(a->ry))
 
 INSN(TNBZ,   TNBZ,        "%s",                             REG(a->rd))
 INSN(TST,   TST,        "%s, %s",                           REG(a->rs), REG(a->rd))

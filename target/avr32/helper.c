@@ -157,3 +157,35 @@ int avr32_cpu_memory_rw_debug(CPUState *cs, vaddr addr, uint8_t *buf,
 {
     return cpu_memory_rw_debug(cs, addr, buf, len, is_write);
 }
+
+//TODO: The saturation might be not working as intended. Add more tests.
+void helper_macsathhw(CPUAVR32AState *env, uint32_t rd, uint32_t op1,  uint32_t op2)
+{
+    uint32_t prod = 0;
+    if(op1 == -1 && op2 == -1){
+        prod = 0x7fffffff;
+        env->sflags[sflagQ] = 1;
+    }
+    else{
+        prod = (op1 * op2) << 1;
+        if((op1 >> 31) && (op2 >> 31) && !(prod >>31)){
+            prod = 0x80000000;
+            env->sflags[sflagQ] = 1;
+        }
+        else if(!(op1 >>31) && !(op2 >> 31) && (prod >>31)){
+            prod = 0x7fffffff;
+            env->sflags[sflagQ] = 1;
+        }
+    }
+
+    uint32_t res = prod + env->r[rd];
+    if((prod >>31) && (env->r[rd] >>31) && !(res >>31)){
+        res = 0x80000000;
+        env->sflags[sflagQ] = 1;
+    }
+    else if(!(prod >>31) && !(env->r[rd] >>31) && (res >>31)){
+        res = 0x7fffffff;
+        env->sflags[sflagQ] = 1;
+    }
+    env->r[rd] = res;
+}
