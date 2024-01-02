@@ -27,6 +27,7 @@
 #include "exec/address-spaces.h"
 #include "exec/helper-proto.h"
 #include "hw/avr32/at32uc3_intc.h"
+#include "fpu/softfloat.h"
 
 static AVR32ACPU * cpu_self;
 static bool first_reset = true;
@@ -95,6 +96,8 @@ static void avr32_cpu_reset(DeviceState *dev)
     }
 
     env->sr = 0;
+    env->fp_status.default_nan_mode = false;
+    env->fp_status.no_signaling_nans = 0x7FC00000;
 
     for(int i= 0; i< 32; i++){
         env->sflags[i] = 0;

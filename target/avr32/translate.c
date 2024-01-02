@@ -843,7 +843,13 @@ static bool trans_COM(DisasContext *ctx, arg_COM *a){
 }
 
 static bool trans_COP(DisasContext *ctx, arg_COP *a){
-    //This instruction is processor specific!
+
+    uint32_t op = (a->oph << 5) | (a->opm << 1) | (a->opl);
+    printf("COP 0x%x, 0x%x, 0x%x\n", a->oph, a->opm, a->opl);
+    printf("COP op: 0x%x\n", op);
+
+    gen_helper_cop(cpu_env, tcg_constant_i32(a->crd), tcg_constant_i32(a->crx), tcg_constant_i32(a->cry), tcg_constant_i32(op));
+
     ctx->base.pc_next += 4;
     return true;
 }

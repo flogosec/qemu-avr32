@@ -22,6 +22,7 @@
 
 #include "cpu-qom.h"
 #include "exec/cpu-defs.h"
+#include "fpu/softfloat-types.h"
 
 #define AVR32_UC3 0x100
 #define AVR32UC3_C    AVR32_UC3 | 0x30
@@ -85,6 +86,7 @@ typedef struct CPUArchState {
 
     //System registers
     uint32_t sysr[AVR32A_SYS_REG];
+    float_status fp_status;
 
     //interrupt source
     int intsrc;
