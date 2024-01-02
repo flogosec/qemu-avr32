@@ -145,8 +145,6 @@ static void fchks(CPUAVR32AState *env, uint32_t ry){
         env->sflags[sflagV] = 1;
         env->sflags[sflagZ] = 0;
     }
-
-    float32_r
 }
 
 void helper_cop(CPUAVR32AState *env, uint32_t rd, uint32_t rx,  uint32_t ry, uint32_t op)
