@@ -13,6 +13,7 @@ avr32_ss.add(files(
   'helper.c',
   'helper_conditions.c',
   'helper_elf.c',
+  'helper_fpu.c',
   'gdbstub.c',
   'translate.c'
   ))
