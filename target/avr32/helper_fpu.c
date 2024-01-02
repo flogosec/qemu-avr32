@@ -71,7 +71,6 @@ static void fnmuls(CPUAVR32AState *env, uint32_t rd, uint32_t rx,  uint32_t ry){
 }
 
 static void fcastsws(CPUAVR32AState *env, uint32_t rd, uint32_t rx){
-    printf("FCASTRSSW\n");
     env->r[rd] = int32_to_float32(env->r[rx], &env->fp_status);
 }
 
@@ -120,14 +119,42 @@ static void fcps(CPUAVR32AState *env, uint32_t rx, uint32_t ry){
     }
 }
 
+static void fchks(CPUAVR32AState *env, uint32_t ry){
+    if(env->r[ry] == 0x7FC00000){
+        env->sflags[sflagC] = 1;
+        env->sflags[sflagN] = 1;
+        env->sflags[sflagV] = 0;
+        env->sflags[sflagZ] = 0;
+    }
+    else if(float32_is_infinity(env->r[ry])){
+        env->sflags[sflagC] = 0;
+        env->sflags[sflagN] = 0;
+        env->sflags[sflagV] = 0;
+        env->sflags[sflagZ] = 0;
+    }
+    else if(float32_is_denormal(env->r[ry])){
+        //TODO add exponent check
+        env->sflags[sflagC] = 0;
+        env->sflags[sflagN] = 0;
+        env->sflags[sflagV] = 0;
+        env->sflags[sflagZ] = 1;
+    }
+    else if(float32_is_normal(env->r[ry])){
+        env->sflags[sflagC] = 0;
+        env->sflags[sflagN] = 0;
+        env->sflags[sflagV] = 1;
+        env->sflags[sflagZ] = 0;
+    }
+
+    float32_r
+}
+
 void helper_cop(CPUAVR32AState *env, uint32_t rd, uint32_t rx,  uint32_t ry, uint32_t op)
 {
     // opm is used as RA register
     if(!(op >> 6)){
-        printf("FPU: ra_reg mode: 0x%x!\n", op);
         uint32_t ra_num = (op & 0b0011110) >> 1;
         op = (op & 0b1100001);
-        printf("OP: 0x%x!\n", op);
         switch (op) {
             case 0:
                 fmacs(env, rd, rx, ry, ra_num);
@@ -159,30 +186,26 @@ void helper_cop(CPUAVR32AState *env, uint32_t rd, uint32_t rx,  uint32_t ry, uin
             fnmuls(env, rd, rx, ry);
         }
         else if((op & 0b1111000) == 0b1001000){
-            printf("FPU: FCAST\n");
             if(op == 0b1001100){
-                printf("Signed\n");
                 fcastsws(env, rd, rx);
             }
             else{
-                printf("Unsigned\n");
                 fcastuws(env, rd, rx);
             }
         }
         else if((op & 0b1111010) == 0b1010010){
-            printf("FPU: FCASTRS\n");
             if(op == 0b1010110){
-                printf("Signed\n");
                 fcastrssw(env, rd, rx);
             }
             else{
-                printf("Unsigned\n");
                 fcastrsuw(env, rd, rx);
             }
         }
         else if((op & 0b1111000) == 0b1011000){
-            printf("FPU: FCPS\n");
             fcps(env, rx, ry);
+        }
+        else if((op == 0b1011010)){
+            fchks(env, ry);
         }
 
     }
