@@ -27,8 +27,8 @@
 static inline void raise_exception(CPUAVR32AState *env, int index,
         uintptr_t retaddr);
 
-static inline void raise_exception(CPUAVR32AState *env, int index,
-        uintptr_t retaddr)
+static inline G_NORETURN void raise_exception(CPUAVR32AState *env, int index,
+                                              uintptr_t retaddr)
 {
     CPUState *cs = env_cpu(env);
 
@@ -38,9 +38,7 @@ static inline void raise_exception(CPUAVR32AState *env, int index,
 
 void helper_raise_illegal_instruction(CPUAVR32AState *env)
 {
-    CPUState *cs = env_cpu(env);
-    raise_exception(env, 23, GETPC());
-    cpu_loop_exit(cs);
+    raise_exception(env, 23, 0);
 }
 
 bool avr32_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
