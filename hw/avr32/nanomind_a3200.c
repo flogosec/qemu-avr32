@@ -108,7 +108,7 @@ static void nanomind_3200_init(MachineState *machine)
 
     // NanoMind Internal I2C
     // 3 Axis Gyroscope
-    dev = DEVICE(i2c_slave_create_simple(nmms->soc.twim[2].bus, "mpu3300", 0x69));
+    dev = DEVICE(i2c_slave_create_simple(nmms->soc.twim[2].bus, "mpu3300", 0x68));
     (void) dev;
     // 3 Axis Compass
     dev = DEVICE(i2c_slave_create_simple(nmms->soc.twim[2].bus, "hmc5843", 0x1e));
