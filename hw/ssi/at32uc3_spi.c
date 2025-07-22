@@ -122,10 +122,6 @@ static uint64_t at32uc_spi_read(void *opaque, hwaddr addr, unsigned int size)
 
 static void at32uc_spi_write(void *opaque, hwaddr addr, uint64_t val64, unsigned int size)
 {
-//    static int counter = 440; // Number to capture the first two fl512 read interactions to check for bad blocks
-//    static int counter = 20000; // Until first [LoadFDIRConfigToFlash] Wrong configID value
-    static int counter = 100000;
-    counter--;
     AT32UC3SPIState* s = opaque;
     uint64_t val = val64;
 
@@ -243,10 +239,6 @@ static void at32uc_spi_write(void *opaque, hwaddr addr, uint64_t val64, unsigned
         default:
             printf("[at32uc_spi_write] unknown, addr: 0x0x%lx, val: 0x%lx\n", addr << 2, val64);
             break;
-    }
-
-    if(!counter) {
-        exit(0);
     }
 }
 
