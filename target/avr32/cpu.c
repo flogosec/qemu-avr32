@@ -108,6 +108,13 @@ static void avr32_cpu_reset(DeviceState *dev)
         env->sysr[i] = 0;
     }
 
+    // sflags == sr == sysr[0]
+    // 16: GM
+    // 21: EM
+    // 22: M0
+    env->sr = (1 << 16) | (1 << 21) | (1 << 22);
+    env->sysr[0] = env->sr;
+
     for(int i= 0; i< AVR32A_REG_PAGE_SIZE; i++){
         env->r[i] = 0;
     }
