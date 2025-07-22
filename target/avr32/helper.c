@@ -23,6 +23,7 @@
 #include "tcg/tcg.h"
 #include "exec/helper-proto.h"
 #include "hw/avr32/boot.h"
+#include "qemu/qemu-print.h"
 
 static inline void raise_exception(CPUAVR32AState *env, int index,
         uintptr_t retaddr);
@@ -38,6 +39,7 @@ static inline G_NORETURN void raise_exception(CPUAVR32AState *env, int index,
 
 void helper_raise_illegal_instruction(CPUAVR32AState *env)
 {
+    qemu_fprintf(stderr, "[%s] Illegal instruction @ %#010x\n", __FUNCTION__, env->r[AVR32A_PC_REG]);
     raise_exception(env, 23, 0);
 }
 
