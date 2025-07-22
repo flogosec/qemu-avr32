@@ -46,10 +46,11 @@ int avr32_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
     printf("Writing GDB input to register %i", n);
 
     uint32_t val = 0;
-    val |= ((*mem_buf & 0x000000FF) << 24);
-    val |= ((*mem_buf & 0x0000FF00) << 8);
-    val |= ((*mem_buf & 0x00FF0000) >> 8);
-    val |= ((*mem_buf & 0xFF000000) >> 24);
+    uint32_t memval = (uint32_t)ldl_p(mem_buf);
+    val |= ((memval & 0x000000FF) << 24);
+    val |= ((memval & 0x0000FF00) << 8);
+    val |= ((memval & 0x00FF0000) >> 8);
+    val |= ((memval & 0xFF000000) >> 24);
     env->r[n] = val;
 
     return 0;

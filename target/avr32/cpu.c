@@ -108,13 +108,20 @@ static void avr32_cpu_reset(DeviceState *dev)
         env->sysr[i] = 0;
     }
 
+    // sflags == sr == sysr[0]
+    // 16: GM
+    // 21: EM
+    // 22: M0
+    env->sr = (1 << 16) | (1 << 21) | (1 << 22);
+    env->sysr[0] = env->sr;
+
     for(int i= 0; i< AVR32A_REG_PAGE_SIZE; i++){
         env->r[i] = 0;
     }
 
     printf("RESET 2\n");
 
-    env->r[AVR32A_PC_REG] = 0xd0000000;
+    env->r[AVR32A_PC_REG] = 0x80000000;
     env->r[AVR32A_LR_REG] = 0;
     env->r[AVR32A_SP_REG] = 0;
 }
@@ -164,10 +171,26 @@ static void avr32_cpu_set_pc(CPUState *cs, vaddr value)
     cpu->env.r[AVR32A_PC_REG] = value;
 }
 
+static vaddr avr32_cpu_get_pc(CPUState *cs)
+{
+    AVR32ACPU *cpu = AVR32A_CPU(cs);
+    return cpu->env.r[AVR32A_PC_REG];
+}
+
 static bool avr32_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
 {
     //TODO: Later
     return false;
+}
+
+static void avr32_restore_state_to_opc(CPUState *cs,
+                                     const TranslationBlock *tb,
+                                     const uint64_t *data)
+{
+    AVR32ACPU *cpu = AVR32A_CPU(cs);
+
+    // TODO: verify whether this is correct...
+    cpu->env.r[AVR32A_PC_REG] = data[0];
 }
 
 #include "hw/core/sysemu-cpu-ops.h"
@@ -179,6 +202,7 @@ static const struct SysemuCPUOps avr32_sysemu_ops = {
 static const struct TCGCPUOps avr32_tcg_ops = {
         .initialize = avr32_tcg_init,
         .synchronize_from_tb = avr32_cpu_synchronize_from_tb,
+        .restore_state_to_opc = avr32_restore_state_to_opc,
         .cpu_exec_interrupt = avr32_cpu_exec_interrupt,
         .tlb_fill = avr32_cpu_tlb_fill,
         .do_interrupt = avr32_cpu_do_interrupt,
@@ -204,6 +228,7 @@ static void avr32a_cpu_class_init(ObjectClass *oc, void *data)
     cc->has_work = avr32_cpu_has_work;
     cc->dump_state = avr32_cpu_dump_state;
     cc->set_pc = avr32_cpu_set_pc;
+    cc->get_pc = avr32_cpu_get_pc;
     cc->memory_rw_debug = avr32_cpu_memory_rw_debug;
     cc->sysemu_ops = &avr32_sysemu_ops;
     cc->disas_set_info = avr32_cpu_disas_set_info;
