@@ -114,7 +114,7 @@ static void avr32_cpu_reset(DeviceState *dev)
 
     printf("RESET 2\n");
 
-    env->r[AVR32A_PC_REG] = 0xd0000000;
+    env->r[AVR32A_PC_REG] = 0x80000000;
     env->r[AVR32A_LR_REG] = 0;
     env->r[AVR32A_SP_REG] = 0;
 }
