@@ -2901,6 +2901,7 @@ static bool trans_RETE(DisasContext *ctx, arg_RETE *a){
     // Check if SR[M2:M0] >= 001
     tcg_gen_brcondi_i32(TCG_COND_EQ, sr_m, 2, if_1);
     tcg_gen_brcondi_i32(TCG_COND_EQ, sr_m, 3, if_1);
+    tcg_gen_brcondi_i32(TCG_COND_EQ, sr_m, 4, if_1);
     tcg_gen_brcondi_i32(TCG_COND_EQ, sr_m, 5, if_1);
     tcg_gen_br(exit);
 
