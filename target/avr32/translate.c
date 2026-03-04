@@ -141,7 +141,7 @@ static bool decode_insn(DisasContext *ctx, uint32_t insn);
 #include "decode-insn.c.inc"
 
 static int sign_extend_8(int number){
-    if((number >> 7) == 1){
+    if(((number >> 7) & 1) == 1){
         number |= 0xFFFFFF00;
     }
     return number;
@@ -3968,7 +3968,9 @@ static bool trans_SUBc_f1(DisasContext *ctx, arg_SUBc_f1 *a){
 
     // if
     gen_set_label(if1);
-    tcg_gen_subi_i32(res, cpu_r[a->rd], a->imm8);
+    // See 32-bit Atmel Architecture Manual chapter 9.4 SUB{cond4} (page.358)
+    // https://ww1.microchip.com/downloads/en/devicedoc/doc32000.pdf
+    tcg_gen_subi_i32(res, cpu_r[a->rd], sign_extend_8(a->imm8));
     tcg_gen_mov_i32(rd, cpu_r[a->rd]);
     tcg_gen_movi_i32(k, sign_extend_8(a->imm8));
     tcg_gen_mov_i32(cpu_r[a->rd], res);
