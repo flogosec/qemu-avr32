@@ -112,7 +112,8 @@ int avr32_print_insn(bfd_vma addr, disassemble_info *info);
 
 static inline int cpu_interrupts_enabled(CPUAVR32AState* env)
 {
-    return AVR32_GM_FLAG(env->sr);
+    // Only check GM bit for now...
+    return (env->sflags[16] == 0);
 }
 
 static inline int cpu_mmu_index(CPUAVR32AState *env, bool ifetch)

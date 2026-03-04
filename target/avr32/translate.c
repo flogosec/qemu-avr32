@@ -141,7 +141,7 @@ static bool decode_insn(DisasContext *ctx, uint32_t insn);
 #include "decode-insn.c.inc"
 
 static int sign_extend_8(int number){
-    if((number >> 7) == 1){
+    if(((number >> 7) & 1) == 1){
         number |= 0xFFFFFF00;
     }
     return number;
@@ -2913,6 +2913,7 @@ static bool trans_RETE(DisasContext *ctx, arg_RETE *a){
     // Check if SR[M2:M0] >= 001
     tcg_gen_brcondi_i32(TCG_COND_EQ, sr_m, 2, if_1);
     tcg_gen_brcondi_i32(TCG_COND_EQ, sr_m, 3, if_1);
+    tcg_gen_brcondi_i32(TCG_COND_EQ, sr_m, 4, if_1);
     tcg_gen_brcondi_i32(TCG_COND_EQ, sr_m, 5, if_1);
     tcg_gen_br(exit);
 
@@ -3298,10 +3299,10 @@ static bool trans_SCALL(DisasContext *ctx, arg_SCALL *a){
 
     TCGv sr_m = tcg_temp_new_i32();
     TCGv temp = tcg_temp_new_i32();
-    tcg_gen_shli_i32(sr_m, cpu_sysr[24], 2);
-    tcg_gen_shli_i32(temp, cpu_sysr[23], 1);
+    tcg_gen_shli_i32(sr_m, cpu_sflags[24], 2);
+    tcg_gen_shli_i32(temp, cpu_sflags[23], 1);
     tcg_gen_or_i32(sr_m, sr_m, temp);
-    tcg_gen_or_i32(sr_m, sr_m, cpu_sysr[22]);
+    tcg_gen_or_i32(sr_m, sr_m, cpu_sflags[22]);
 
 
     tcg_gen_brcondi_i32(TCG_COND_EQ, sr_m, 0, if_1);
@@ -3319,8 +3320,7 @@ static bool trans_SCALL(DisasContext *ctx, arg_SCALL *a){
     tcg_gen_qemu_st_i32(temp, cpu_r[SP_REG], 0x0, MO_BEUL);
 
     for(int i= 0; i< 32; i++){
-        tcg_gen_mov_i32(temp, cpu_sflags[i]);
-        tcg_gen_shli_i32(sr, cpu_sflags[i], i);
+        tcg_gen_shli_i32(temp, cpu_sflags[i], i);
         tcg_gen_or_i32(sr, sr, cpu_sflags[i]);
     }
     tcg_gen_subi_i32(cpu_r[SP_REG], cpu_r[SP_REG], 0x4);
@@ -3336,7 +3336,7 @@ static bool trans_SCALL(DisasContext *ctx, arg_SCALL *a){
 
     // else
     gen_set_label(if_1_else);
-    tcg_gen_movi_i32(cpu_r[LR_REG], ctx->base.pc_next + 2);
+    tcg_gen_addi_i32(cpu_r[LR_REG], cpu_r[PC_REG], 0x2);
     tcg_gen_addi_i32(cpu_r[PC_REG], cpu_sysr[1], 0x100);
 
     gen_set_label(exit);
@@ -3985,7 +3985,9 @@ static bool trans_SUBc_f1(DisasContext *ctx, arg_SUBc_f1 *a){
 
     // if
     gen_set_label(if1);
-    tcg_gen_subi_i32(res, cpu_r[a->rd], a->imm8);
+    // See 32-bit Atmel Architecture Manual chapter 9.4 SUB{cond4} (page.358)
+    // https://ww1.microchip.com/downloads/en/devicedoc/doc32000.pdf
+    tcg_gen_subi_i32(res, cpu_r[a->rd], sign_extend_8(a->imm8));
     tcg_gen_mov_i32(rd, cpu_r[a->rd]);
     tcg_gen_movi_i32(k, sign_extend_8(a->imm8));
     tcg_gen_mov_i32(cpu_r[a->rd], res);
