@@ -147,7 +147,7 @@ static void nanomind_3200_init(MachineState *machine)
 
     if (machine->firmware) {
         if (!avr32_load_firmware(&nmms->soc.cpu.cpu, machine,
-                                 &nmms->soc.sdram, machine->firmware)) {
+                                 &nmms->soc.onChipFlash, machine->firmware)) {
             exit(1);
         }
     }
